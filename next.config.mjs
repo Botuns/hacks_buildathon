@@ -30,6 +30,7 @@ const nextConfig = {
       },
     ],
   },
+  transpilePackages: ["next-mdx-remote"],
 };
 
 const withMDX = createMDX({

@@ -12,7 +12,7 @@ export async function searchImages(
       hl: "en",
     },
     headers: {
-      "x-rapidapi-key": "55cc28568emsh9e708db9bf53c80p1f4a42jsn639663033b65",
+      "x-rapidapi-key": process.env.RAPIDAPI_KEY ?? "",
       "x-rapidapi-host": "joj-image-search.p.rapidapi.com",
     },
   };

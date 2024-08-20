@@ -14,7 +14,7 @@ export async function OpenAiGpt(prompt: string) {
       {
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer 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`,
+          Authorization: `Bearer ${process.env.OPEN_AI_KEY}`,
         },
       }
     );

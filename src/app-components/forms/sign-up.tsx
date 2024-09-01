@@ -63,7 +63,7 @@ export default function SignUp() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setError("");
     try {
-      const response = await fetch("/api/register", {
+      const response = await fetch("/api/users/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -78,7 +78,7 @@ export default function SignUp() {
 
       const userData = await response.json();
       console.log("User registered:", userData);
-      router.push("/login"); // Adjust this path as needed
+      // router.push("/login"); // Adjust this path as needed
     } catch (error) {
       if (error instanceof Error) {
         setError(error.message);

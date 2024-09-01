@@ -89,7 +89,7 @@ export default function SignUp() {
   }
 
   return (
-    <div className="mx-auto max-w-md space-y-6">
+    <div className="mx-auto max-w-[90%] space-y-6">
       <div className="space-y-2 text-center">
         <h1 className="text-3xl font-bold">
           Welcome to <span className="text-primary">Eduifa</span>!

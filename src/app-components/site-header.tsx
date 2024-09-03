@@ -65,7 +65,7 @@ function SiteHeader({}: Props) {
           Contact
         </Link>
         <Link
-          href="#"
+          href="/auth/sign-up"
           className="text-sm font-medium hover:underline underline-offset-4"
           prefetch={false}
         >

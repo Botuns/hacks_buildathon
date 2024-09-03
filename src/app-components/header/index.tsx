@@ -18,6 +18,7 @@ import { getUserFromLocalStorage, User } from "@/app/helpers/user";
 
 export default function DashBoardHeader() {
   const user: User | null = getUserFromLocalStorage();
+  console.log(user);
 
   return (
     <header className="flex items-center h-16 px-4 border-b shrink-0 md:px-6">

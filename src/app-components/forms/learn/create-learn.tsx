@@ -37,8 +37,11 @@ import { extractVideoUrlsAndDescriptions } from "@/app/helpers/extract-youtube-r
 import { searchImages } from "../../../../services/image-search-helper";
 import { extractImageInfo } from "@/app/helpers/extract-image-response";
 import { refined_learn_generator_prompt } from "@/app/helpers/learn_generator_prompt";
-import { OpenAiGpt } from "../../../../services/gpt";
+import { CourseContent, OpenAiGpt } from "../../../../services/gpt";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { getUserFromLocalStorage, User } from "@/app/helpers/user";
+import { Course } from "@prisma/client";
 
 const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -54,6 +57,11 @@ const formSchema = z.object({
 
 export default function LearningRequest() {
   const router = useRouter();
+  const [user, setUser] = useState<User | null>(null);
+  useEffect(() => {
+    const user = getUserFromLocalStorage();
+    setUser(user);
+  }, []);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -76,13 +84,46 @@ export default function LearningRequest() {
           const images = extractImageInfo(img_res.data.response.images);
           // console.log(images);
           const prompt = refined_learn_generator_prompt(values, videos, images);
-          const open_ai_response = await OpenAiGpt(prompt);
+          const open_ai_response: CourseContent = await OpenAiGpt(prompt);
           console.log(open_ai_response);
-          // const serializedContent = await serialize(open_ai_response);
+          // check if open ai response is of type CourseContent
+          if (
+            typeof open_ai_response === "object" &&
+            open_ai_response.hasOwnProperty("title") &&
+            open_ai_response.hasOwnProperty("contents") &&
+            open_ai_response.hasOwnProperty("numberOfSections")
+          ) {
+            const courseCreateBody = {
+              title: open_ai_response.title,
+              contents: open_ai_response.contents,
+              userId: user?.id as string,
+              numberOfSections: open_ai_response.numberOfSections,
+            };
+            const response = await fetch("/api/users/courses", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(courseCreateBody),
+            });
 
-          // localStorage.setItem("mdxContent", JSON.stringify(serializedContent));
-          toast.success("Learning content generated successfully");
-          // router.push(`/dashboard/learn/${"14567gfdcbvsdyt"}`);
+            if (!response.ok) {
+              const errorData = await response.json();
+              toast.error(errorData.error || "Failed to create course");
+            }
+            if (response.ok) {
+              // fetch the course id and redirect to the course page
+              const courseData = await response.json();
+              console.log("Course created:", courseData);
+              const courseId = courseData.course.id;
+              router.push(`/dashboard/learn/${courseId}`);
+              toast.success("Learning content generated successfully");
+            }
+          }
+          if (!open_ai_response) {
+            toast.error("Failed to generate learning content");
+          }
+          toast.error("Unexpected error occurred");
         }
       }
     } catch (error: any) {

@@ -24,6 +24,11 @@
 // }
 
 import axios from "axios";
+export type CourseContent = {
+  title: string;
+  contents: string[]; 
+  numberOfSections: number;
+};
 
 const BASE_URL = "https://golive.gmind.ai/v1"; // New base URL
 const token =
@@ -59,7 +64,7 @@ export async function OpenAiGpt(prompt: string) {
     const AIRESULT = response?.data?.data?.choices[0]?.message;
     const generatedContent = AIRESULT?.content;
     const formattedData = JSON.parse(generatedContent);
-    console.log(formattedData);
+    // console.log(formattedData);
 
     // Check if the response data is valid
     // if (!Array.isArray(formattedData)) {

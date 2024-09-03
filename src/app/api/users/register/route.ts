@@ -11,15 +11,13 @@ export async function POST(request: Request) {
       class: userClass,
     } = await request.json();
 
-    // Basic validation
     if (!fullName || !email || !password) {
       return NextResponse.json(
         { message: "Full name, email, and password are required." },
-        { status: 400 } // Bad Request
+        { status: 400 } 
       );
     }
 
-    // Create user in the database
     const user = await prisma.user.create({
       data: {
         fullName,
@@ -31,43 +29,37 @@ export async function POST(request: Request) {
 
     return NextResponse.json(
       { message: "User created successfully", user: user },
-      { status: 201 } // Created
+      { status: 201 } 
     );
   } catch (error:any) {
     if (error instanceof PrismaClientKnownRequestError) {
-      // Handle specific Prisma errors
       if (error.code === "P2002") {
-        // Unique constraint violation
         return NextResponse.json(
           { message: "A user with this email already exists." },
-          { status: 409 } // Conflict
+          { status: 409 } 
         );
       } else if (error.code === "P2025") {
-        // Record not found
         return NextResponse.json(
           { message: "Record not found." },
-          { status: 404 } // Not Found
+          { status: 404 } 
         );
       }
-      // Handle other Prisma errors
       return NextResponse.json(
         { message: "Database error", details: error.message },
-        { status: 500 } // Internal Server Error
+        { status: 500 } 
       );
     }
 
-    // Handle validation and operational errors
     if (error instanceof SyntaxError) {
       return NextResponse.json(
         { message: "Invalid JSON format in request." },
-        { status: 400 } // Bad Request
+        { status: 400 } 
       );
     }
 
-    // Handle unexpected errors
     return NextResponse.json(
       { message: "An unexpected error occurred.", details: error.message },
-      { status: 500 } // Internal Server Error
+      { status: 500 } 
     );
   }
 }

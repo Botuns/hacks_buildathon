@@ -32,6 +32,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { toast, Toaster } from "sonner";
 
 const formSchema = z.object({
   fullName: z.string().min(2, {
@@ -73,23 +74,28 @@ export default function SignUp() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to register");
+        // throw new Error(errorData.error || "Failed to register");
+        toast.error(errorData.error || "Failed to register");
       }
 
       const userData = await response.json();
       console.log("User registered:", userData);
-      // router.push("/login"); // Adjust this path as needed
+      localStorage.setItem("user", JSON.stringify(userData));
+      router.push("/dashboard"); // Adjust this path as needed
     } catch (error) {
       if (error instanceof Error) {
         setError(error.message);
+        toast.error(error.message);
       } else {
         setError("An unknown error occurred");
+        toast.error("An unknown error occurred");
       }
     }
   }
 
   return (
     <div className="mx-auto max-w-[90%] space-y-6">
+      <Toaster richColors />
       <div className="space-y-2 text-center">
         <h1 className="text-3xl font-bold">
           Welcome to <span className="text-primary">Eduifa</span>!

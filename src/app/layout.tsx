@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import { CustomProvider } from "rsuite";
 import "rsuite/dist/rsuite-no-reset.min.css";
 import "./globals.css";
+import { Toaster } from "sonner";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,6 +21,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <CustomProvider>{children}</CustomProvider>
+        <Toaster richColors />
       </body>
     </html>
   );

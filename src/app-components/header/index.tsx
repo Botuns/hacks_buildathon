@@ -14,8 +14,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { getUserFromLocalStorage, User } from "@/app/helpers/user";
 
 export default function DashBoardHeader() {
+  const user: User | null = getUserFromLocalStorage();
+
   return (
     <header className="flex items-center h-16 px-4 border-b shrink-0 md:px-6">
       <Link
@@ -34,36 +37,10 @@ export default function DashBoardHeader() {
               className="group inline-flex h-9 w-max items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50 text-white"
               prefetch={false}
             >
-              Welcome Olajide AbdulQahar 🎉
+              Welcome {user ? user.fullName : "Guest"} 🎉
             </Link>
           </NavigationMenuLink>
-          <NavigationMenuLink asChild>
-            <Link
-              href="#"
-              className="group inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50"
-              prefetch={false}
-            >
-              Continue Learning
-            </Link>
-          </NavigationMenuLink>
-          <NavigationMenuLink asChild>
-            <Link
-              href="#"
-              className="group inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50"
-              prefetch={false}
-            >
-              Quick Chat
-            </Link>
-          </NavigationMenuLink>
-          <NavigationMenuLink asChild>
-            <Link
-              href="#"
-              className="group inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50"
-              prefetch={false}
-            >
-              Call a Tutor
-            </Link>
-          </NavigationMenuLink>
+          {/* Other NavigationMenuLink items */}
         </NavigationMenuList>
       </NavigationMenu>
       <div className="ml-auto flex items-center gap-2">
@@ -86,50 +63,65 @@ export default function DashBoardHeader() {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <div className="flex items-center gap-2 p-2">
-              <Avatar className="h-8 w-8">
-                <AvatarImage src="/user.svg" />
-                <AvatarFallback>JD</AvatarFallback>
-              </Avatar>
-              <div className="grid gap-0.5 leading-none">
-                <div className="font-semibold">John Doe</div>
-                <div className="text-sm text-muted-foreground">
-                  john@example.com
+            {user ? (
+              <>
+                <div className="flex items-center gap-2 p-2">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src="/user.svg" />
+                    <AvatarFallback>JD</AvatarFallback>
+                  </Avatar>
+                  <div className="grid gap-0.5 leading-none">
+                    <div className="font-semibold">{user.fullName}</div>
+                    <div className="text-sm text-muted-foreground">
+                      {user.email}
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <Link
-                href="#"
-                className="flex items-center gap-2"
-                prefetch={false}
-              >
-                <div className="h-4 w-4" />
-                <span>Profile</span>
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Link
-                href="#"
-                className="flex items-center gap-2"
-                prefetch={false}
-              >
-                <div className="h-4 w-4" />
-                <span>Settings</span>
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <Link
-                href="#"
-                className="flex items-center gap-2"
-                prefetch={false}
-              >
-                <div className="h-4 w-4" />
-                <span>Sign out</span>
-              </Link>
-            </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>
+                  <Link
+                    href="#"
+                    className="flex items-center gap-2"
+                    prefetch={false}
+                  >
+                    <div className="h-4 w-4" />
+                    <span>Profile</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Link
+                    href="#"
+                    className="flex items-center gap-2"
+                    prefetch={false}
+                  >
+                    <div className="h-4 w-4" />
+                    <span>Settings</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>
+                  <Link
+                    href="#"
+                    className="flex items-center gap-2"
+                    prefetch={false}
+                  >
+                    <div className="h-4 w-4" />
+                    <span>Sign out</span>
+                  </Link>
+                </DropdownMenuItem>
+              </>
+            ) : (
+              <DropdownMenuItem>
+                <Link
+                  href="#"
+                  className="flex items-center gap-2"
+                  prefetch={false}
+                >
+                  <div className="h-4 w-4" />
+                  <span>Sign in</span>
+                </Link>
+              </DropdownMenuItem>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

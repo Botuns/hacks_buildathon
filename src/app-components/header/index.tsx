@@ -1,3 +1,4 @@
+"use client";
 import Link from "next/link";
 import {
   NavigationMenu,
@@ -15,10 +16,14 @@ import {
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { getUserFromLocalStorage, User } from "@/app/helpers/user";
+import { useEffect, useState } from "react";
 
 export default function DashBoardHeader() {
-  const user: User | null = getUserFromLocalStorage();
-  console.log(user);
+  const [user, setUser] = useState<User | null>(null);
+  useEffect(() => {
+    const user = getUserFromLocalStorage();
+    setUser(user);
+  }, []);
 
   return (
     <header className="flex items-center h-16 px-4 border-b shrink-0 md:px-6">

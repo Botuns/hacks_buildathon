@@ -77,11 +77,12 @@ export default function LearningRequest() {
           // console.log(images);
           const prompt = refined_learn_generator_prompt(values, videos, images);
           const open_ai_response = await OpenAiGpt(prompt);
-          const serializedContent = await serialize(open_ai_response);
+          console.log(open_ai_response);
+          // const serializedContent = await serialize(open_ai_response);
 
-          localStorage.setItem("mdxContent", JSON.stringify(serializedContent));
+          // localStorage.setItem("mdxContent", JSON.stringify(serializedContent));
           toast.success("Learning content generated successfully");
-          router.push(`/dashboard/learn/${"14567gfdcbvsdyt"}`);
+          // router.push(`/dashboard/learn/${"14567gfdcbvsdyt"}`);
         }
       }
     } catch (error: any) {

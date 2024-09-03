@@ -67,5 +67,18 @@ export function refined_learn_generator_prompt(
     - **Content Quality**: Ensure the explanations are clear and appropriate for the specified understanding and difficulty levels.
     - **Modularity**: Structure content so that each section can stand alone but also contributes to the overall lesson.
     
-    **Note**: You should not generate any output other than the mdx content so that I can successfully parse the content. also note that your geneartion should never strt with : \`\`\`mdx\` or end with \`\`\`;`;
+    **Note**: you are to be strict with your output. The output should follow this json structure: 
+   {
+  title           "The best title for the course"
+  contents        String[]----array of mdx content(sections)
+  numberOfSections Int
+  }.
+  you are to generate a vast amount of mdx content for the course, the number of sections should be equal to the number of sections in the course, each section should be unique and informative,be sure to include the videos and images provided in the content and make sure you do not generate anything other than the given and required format. and please remove the '\`\'"\`\`\`json...\`\`\`'\"'\`\' from the output because i would not be able to parse it. just the correct json format please be strict with the rules and also for no reason should you warp the json inside "". just start withthe { and end with the }.
+  I repeat, your output should be in this format:  {
+      "title": "The best title for the course",
+      "contents": [ "Array of MDX content sections" ]----array consists of multiple strings, each string representing a different section of the text. Separate the introduction, each section, and the conclusion into distinct strings.e.g :["section1","section2","...","conclusion"],
+      "numberOfSections": Integer
+    }
+      and Only return the JSON object formatted correctly without any extra text or explanations.
+  `;
 }

@@ -36,7 +36,7 @@ export async function POST(request: Request) {
       if (error.code === "P2002") {
         return NextResponse.json(
           { message: "A user with this email already exists." },
-          { status: 409 } 
+          { status: 400 } 
         );
       } else if (error.code === "P2025") {
         return NextResponse.json(

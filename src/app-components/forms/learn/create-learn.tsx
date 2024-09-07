@@ -116,8 +116,8 @@ export default function LearningRequest() {
               const courseData = await response.json();
               console.log("Course created:", courseData);
               const courseId = courseData.course.id;
-              router.push(`/dashboard/learn/${courseId}`);
               toast.success("Learning content generated successfully");
+              router.push(`/dashboard/learn/${courseId}`);
             }
           }
           if (!open_ai_response) {

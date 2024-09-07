@@ -81,7 +81,7 @@ export default function SignUp() {
       const userData = await response.json();
       console.log("User registered:", userData);
       localStorage.setItem("user", JSON.stringify(userData));
-      router.push("/dashboard"); // Adjust this path as needed
+      router.push("/dashboard"); 
     } catch (error) {
       if (error instanceof Error) {
         setError(error.message);

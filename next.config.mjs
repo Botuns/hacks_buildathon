@@ -34,6 +34,14 @@ const nextConfig = {
 };
 
 const withMDX = createMDX({
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "**",
+      },
+    ],
+  },
   options: {
     remarkPlugins: [
       remarkFrontmatter,

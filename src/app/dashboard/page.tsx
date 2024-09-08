@@ -33,6 +33,10 @@ export default function Component() {
   const [searchTerm, setSearchTerm] = useState("");
   const router = useRouter();
 
+  function Navigate(url: string) {
+    router.push(url);
+  }
+
   useEffect(() => {
     async function fetchCourses() {
       setLoading(true);
@@ -130,6 +134,7 @@ export default function Component() {
           <Button
             variant="outline"
             className="h-24 flex flex-col items-center justify-center space-y-2"
+            onClick={() => Navigate("/dashboard/call")}
           >
             <MessageSquare className="h-6 w-6" />
             <span>Chat with AI</span>

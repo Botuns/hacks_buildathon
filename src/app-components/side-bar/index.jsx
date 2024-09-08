@@ -36,7 +36,7 @@ export default function SideBar() {
     { href: "#", icon: BookOpen, label: "Lectures Paradise" },
     { href: "#", icon: Clipboard, label: "Exams" },
     { href: "#", icon: Rocket, label: "AI Exams" },
-    { href: "#", icon: Mic, label: "Voice Tutor" },
+    { href: "/dashboard/call", icon: Mic, label: "Voice Tutor" },
     { href: "#", icon: BookOpen, label: "Explainers" },
     { href: "#", icon: FileText, label: "PDF/Q&A" },
     { href: "#", icon: Cloud, label: "Photos" },

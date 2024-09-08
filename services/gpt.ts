@@ -26,7 +26,7 @@
 import axios from "axios";
 export type CourseContent = {
   title: string;
-  contents: string[]; 
+  contents: string[];
   numberOfSections: number;
 };
 
@@ -37,8 +37,8 @@ const token =
 export async function OpenAiGpt(prompt: string) {
   try {
     const systemPrompt =
-      "You are the most brilliant AI tasked with generating an educational MDX content array for a learning module."; // Replace with actual system prompt if needed
-    const messages = { role: "user", content: prompt }; // User prompt message
+      "You are the most brilliant AI tasked with generating an educational MDX content array for a learning module.";
+    const messages = { role: "user", content: prompt };
 
     const response = await axios.post(
       `${BASE_URL}/knowledge-base`,
@@ -60,16 +60,44 @@ export async function OpenAiGpt(prompt: string) {
       }
     );
 
-    // Extract and format the response content
     const AIRESULT = response?.data?.data?.choices[0]?.message;
     const generatedContent = AIRESULT?.content;
     const formattedData = JSON.parse(generatedContent);
-    // console.log(formattedData);
 
-    // Check if the response data is valid
-    // if (!Array.isArray(formattedData)) {
-    //   throw new Error("Invalid data format received from API");
-    // }
+    return formattedData;
+  } catch (error) {
+    console.error("Error while fetching AI response:", error);
+    return [];
+  }
+}
+
+export async function OpenAiGptVoicechat(prompt: string, systemPrompt: string) {
+  try {
+    const messages = { role: "user", content: prompt };
+
+    const response = await axios.post(
+      `${BASE_URL}/knowledge-base`,
+      {
+        model: "gpt-4o-mini",
+        messages: [
+          {
+            role: "system",
+            content: systemPrompt,
+          },
+          messages,
+        ],
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    const AIRESULT = response?.data?.data?.choices[0]?.message;
+    const generatedContent = AIRESULT?.content;
+    const formattedData = JSON.parse(generatedContent);
 
     return formattedData;
   } catch (error) {

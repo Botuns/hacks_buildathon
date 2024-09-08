@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
 import {
   Grid,
@@ -15,159 +18,89 @@ import {
   HelpCircle,
   LogOut,
   Rocket,
+  Menu,
 } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 export default function SideBar() {
-  return (
-    <div className="flex  bg-background  ">
-      <div className="flex flex-col items-start gap-4 border-r bg-muted/40 p-4   ">
+  const [isOpen, setIsOpen] = useState(false);
+
+  const navItems = [
+    { href: "#", icon: Grid, label: "Dashboard" },
+    { href: "/dashboard/learn", icon: Book, label: "Study" },
+    { href: "#", icon: Search, label: "Search" },
+    { href: "#", icon: Folder, label: "Projects" },
+    { href: "#", icon: BookOpen, label: "Lectures Paradise" },
+    { href: "#", icon: Clipboard, label: "Exams" },
+    { href: "#", icon: Rocket, label: "AI Exams" },
+    { href: "#", icon: Mic, label: "Voice Tutor" },
+    { href: "#", icon: BookOpen, label: "Explainers" },
+    { href: "#", icon: FileText, label: "PDF/Q&A" },
+    { href: "#", icon: Cloud, label: "Photos" },
+    { href: "#", icon: CloudLightning, label: "Groups" },
+    { href: "#", icon: Bell, label: "Notifications" },
+    { href: "#", icon: Lightbulb, label: "Profile" },
+    { href: "#", icon: HelpCircle, label: "Help" },
+    { href: "#", icon: Lightbulb, label: "Tips" },
+    { href: "#", icon: LogOut, label: "Logout" },
+  ];
+
+  const SidebarContent = () => (
+    <div className="flex flex-col h-full">
+      <div className="flex items-center h-16 px-4 mb-[1%]">
         <Link
           href="#"
           className="flex items-center gap-2 font-semibold"
           prefetch={false}
         >
-          <img src="/pLogo.png" className="h-10 w-10 lg:h-16 lg:w-16" />
+          <img src="/pLogo.png" className="h-8 w-8 " alt="Eduifa Logo" />
           <span className="text-lg">Eduifa</span>
         </Link>
-        <nav className="flex flex-col items-start gap-2 text-sm font-medium w-full ">
-          <Link
-            href="#"
-            className="flex items-center gap-2 rounded-md px-3 py-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground bg-primary text-white w-full"
-            prefetch={false}
-          >
-            <Grid className="h-4 w-4" />
-            Dashboard
-          </Link>
-          <Link
-            href="/dashboard/learn"
-            className="flex items-center gap-2 rounded-md px-3 py-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground w-full"
-            prefetch={false}
-          >
-            <Book className="h-4 w-4" />
-            Study
-          </Link>
-          <Link
-            href="#"
-            className="flex items-center gap-2 rounded-md px-3 py-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground w-full"
-            prefetch={false}
-          >
-            <Search className="h-4 w-4" />
-            Search
-          </Link>
-          <Link
-            href="#"
-            className="flex items-center gap-2 rounded-md px-3 py-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground w-full"
-            prefetch={false}
-          >
-            <Folder className="h-4 w-4" />
-            Projects
-          </Link>
-          <Link
-            href="#"
-            className="flex items-center gap-2 rounded-md px-3 py-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground w-full"
-            prefetch={false}
-          >
-            <BookOpen className="h-4 w-4" />
-            Lectures Paradise
-          </Link>
-          <Link
-            href="#"
-            className="flex items-center gap-2 rounded-md px-3 py-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground w-full"
-            prefetch={false}
-          >
-            <Clipboard className="h-4 w-4" />
-            Exams
-          </Link>
-          <Link
-            href="#"
-            className="flex items-center gap-2 rounded-md px-3 py-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground w-full"
-            prefetch={false}
-          >
-            <Rocket className="h-4 w-4" />
-            AI Exams
-          </Link>
-          <Link
-            href="#"
-            className="flex items-center gap-2 rounded-md px-3 py-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground w-full"
-            prefetch={false}
-          >
-            <Mic className="h-4 w-4" />
-            Voice Tutor
-          </Link>
-          <Link
-            href="#"
-            className="flex items-center gap-2 rounded-md px-3 py-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground w-full"
-            prefetch={false}
-          >
-            <BookOpen className="h-4 w-4" />
-            Explainers
-          </Link>
-          <Link
-            href="#"
-            className="flex items-center gap-2 rounded-md px-3 py-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground w-full"
-            prefetch={false}
-          >
-            <FileText className="h-4 w-4" />
-            PDF/Q&A
-          </Link>
-          <Link
-            href="#"
-            className="flex items-center gap-2 rounded-md px-3 py-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground w-full"
-            prefetch={false}
-          >
-            <Cloud className="h-4 w-4" />
-            Photos
-          </Link>
-          <Link
-            href="#"
-            className="flex items-center gap-2 rounded-md px-3 py-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground w-full"
-            prefetch={false}
-          >
-            <CloudLightning className="h-4 w-4" />
-            Groups
-          </Link>
-          <Link
-            href="#"
-            className="flex items-center gap-2 rounded-md px-3 py-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground w-full"
-            prefetch={false}
-          >
-            <Bell className="h-4 w-4" />
-            Notifications
-          </Link>
-          <Link
-            href="#"
-            className="flex items-center gap-2 rounded-md px-3 py-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground w-full"
-            prefetch={false}
-          >
-            <Lightbulb className="h-4 w-4" />
-            Profile
-          </Link>
-          <Link
-            href="#"
-            className="flex items-center gap-2 rounded-md px-3 py-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground w-full"
-            prefetch={false}
-          >
-            <HelpCircle className="h-4 w-4" />
-            Help
-          </Link>
-          <Link
-            href="#"
-            className="flex items-center gap-2 rounded-md px-3 py-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground w-full"
-            prefetch={false}
-          >
-            <Lightbulb className="h-4 w-4" />
-            Tips
-          </Link>
-          <Link
-            href="#"
-            className="flex items-center gap-2 rounded-md px-3 py-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground w-full"
-            prefetch={false}
-          >
-            <LogOut className="h-4 w-4" />
-            Logout
-          </Link>
-        </nav>
       </div>
+      <ScrollArea className="flex-1 px-2">
+        <nav className="flex flex-col gap-1 mt-[1%]">
+          {navItems.map((item, index) => (
+            <Link key={index} href={item.href} prefetch={false}>
+              <Button
+                variant={index === 0 ? "default" : "ghost"}
+                className={cn(
+                  "w-full justify-start gap-2",
+                  index === 0 && "bg-primary text-primary-foreground"
+                )}
+              >
+                <item.icon className="h-4 w-4" />
+                {item.label}
+              </Button>
+            </Link>
+          ))}
+        </nav>
+      </ScrollArea>
     </div>
+  );
+
+  return (
+    <>
+      <Sheet open={isOpen} onOpenChange={setIsOpen}>
+        <SheetTrigger asChild>
+          <Button
+            variant="outline"
+            size="icon"
+            className="fixed top-4 left-4 z-50 md:hidden"
+          >
+            <Menu className="h-4 w-4" />
+            <span className="sr-only">Toggle sidebar</span>
+          </Button>
+        </SheetTrigger>
+        <SheetContent side="left" className="p-0 w-64">
+          <SidebarContent />
+        </SheetContent>
+      </Sheet>
+      <div className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0">
+        <SidebarContent />
+      </div>
+    </>
   );
 }

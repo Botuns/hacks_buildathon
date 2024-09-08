@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import prisma from "../../../../../lib/prisma";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import { db } from "@/lib/db";
 
 export async function POST(request: Request) {
   try {
@@ -18,7 +18,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const course = await prisma.course.create({
+    const course = await db.course.create({
       data: {
         title,
         contents,

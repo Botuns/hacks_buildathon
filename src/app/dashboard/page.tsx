@@ -168,10 +168,7 @@ export default function Component() {
                 onClick={() => navigateToCourse(course.id)}
               >
                 <Image
-                  src={
-                    `https://source.unsplash.com/random/400x200?abstract,${course.id}` ||
-                    "https://picsum.photos/200/300"
-                  }
+                  src={"https://picsum.photos/200/300"}
                   alt={course.title}
                   width={400}
                   height={200}

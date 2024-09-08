@@ -168,7 +168,9 @@ export default function Component() {
                 onClick={() => navigateToCourse(course.id)}
               >
                 <Image
-                  src={"https://picsum.photos/200/300"}
+                  src={
+                    "https://img.freepik.com/free-vector/abstract-organic-pattern-design-background_1048-19286.jpg"
+                  }
                   alt={course.title}
                   width={400}
                   height={200}

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import {
   Card,
   CardContent,
@@ -11,7 +12,6 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
 import {
   Loader2,
@@ -22,18 +22,12 @@ import {
   Trophy,
   Settings,
   HelpCircle,
+  Search,
 } from "lucide-react";
 import { getUserCourses } from "../helpers/queries";
 import { Course } from "@prisma/client";
 
-// type Course = {
-//   id: string;
-//   title: string;
-//   currentProgress: number;
-//   numberOfSections: number;
-// };
-
-export default function Dashboard() {
+export default function Component() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -45,6 +39,7 @@ export default function Dashboard() {
       try {
         const userId = "e01ef169-0248-436b-a4fd-6a53c78e5990";
         const response = await getUserCourses(userId);
+        console.log("response", response);
         if (response.success && response.data) {
           setCourses(response.data);
         } else {
@@ -67,13 +62,23 @@ export default function Dashboard() {
     router.push(`/dashboard/learn/${courseId}`);
   };
 
-  return (
-    <div className="p-8">
-      <h1 className="text-4xl font-bold mb-8">
-        Welcome to Your Learning Dashboard
-      </h1>
+  const overallProgress =
+    courses.length > 0
+      ? Math.round(
+          (courses.reduce(
+            (sum, course) =>
+              sum + course.currentProgress / course.numberOfSections,
+            0
+          ) /
+            courses.length) *
+            100
+        )
+      : 0;
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+  return (
+    <div className="container mx-auto p-8 space-y-8">
+      <h1 className="text-4xl font-bold">Your Learning Dashboard</h1>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Courses</CardTitle>
@@ -105,41 +110,51 @@ export default function Dashboard() {
             <CardTitle className="text-sm font-medium">
               Overall Progress
             </CardTitle>
-            <Progress value={33} className="w-[60px]" />
+            <Progress value={overallProgress} className="w-[60px]" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">33%</div>
+            <div className="text-2xl font-bold">{overallProgress}%</div>
           </CardContent>
         </Card>
       </div>
-
-      <div className="mb-8">
-        <h2 className="text-2xl font-semibold mb-4">AI-Powered Features</h2>
+      <div className="space-y-4">
+        <h2 className="text-2xl font-semibold">AI-Powered Features</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-          <Button className="h-24 flex flex-col items-center justify-center space-y-2">
+          <Button
+            variant="outline"
+            className="h-24 flex flex-col items-center justify-center space-y-2"
+          >
             <Mic className="h-6 w-6" />
             <span>Voice Call with AI</span>
           </Button>
-          <Button className="h-24 flex flex-col items-center justify-center space-y-2">
+          <Button
+            variant="outline"
+            className="h-24 flex flex-col items-center justify-center space-y-2"
+          >
             <MessageSquare className="h-6 w-6" />
             <span>Chat with AI</span>
           </Button>
-          <Button className="h-24 flex flex-col items-center justify-center space-y-2">
+          <Button
+            variant="outline"
+            className="h-24 flex flex-col items-center justify-center space-y-2"
+          >
             <FileText className="h-6 w-6" />
             <span>Chat with PDF</span>
           </Button>
         </div>
       </div>
-
-      <div>
-        <h2 className="text-2xl font-semibold mb-4">Your Recent Courses</h2>
-        <Input
-          type="text"
-          placeholder="Search courses..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="mb-4"
-        />
+      <div className="space-y-4">
+        <h2 className="text-2xl font-semibold">Your Recent Courses</h2>
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+          <Input
+            type="text"
+            placeholder="Search courses..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10"
+          />
+        </div>
         {loading ? (
           <div className="flex justify-center items-center h-32">
             <Loader2 className="h-8 w-8 animate-spin" />
@@ -149,22 +164,32 @@ export default function Dashboard() {
             {filteredCourses.map((course) => (
               <Card
                 key={course.id}
-                className="cursor-pointer hover:shadow-lg transition-shadow duration-300"
+                className="overflow-hidden hover:shadow-lg transition-shadow duration-300"
                 onClick={() => navigateToCourse(course.id)}
               >
+                <Image
+                  src={
+                    `https://source.unsplash.com/random/400x200?abstract,${course.id}` ||
+                    "https://picsum.photos/200/300"
+                  }
+                  alt={course.title}
+                  width={400}
+                  height={200}
+                  className="w-full h-48 object-cover"
+                />
                 <CardHeader>
-                  <CardTitle>{course.title}</CardTitle>
+                  <CardTitle className="line-clamp-1">{course.title}</CardTitle>
                   <CardDescription>
                     Progress: {course.currentProgress} /{" "}
                     {course.numberOfSections} sections
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="space-y-2">
                   <Progress
                     value={
                       (course.currentProgress / course.numberOfSections) * 100
                     }
-                    className="mb-2"
+                    className="w-full"
                   />
                   <Button className="w-full">Continue Learning</Button>
                 </CardContent>
@@ -173,8 +198,7 @@ export default function Dashboard() {
           </div>
         )}
       </div>
-
-      <div className="mt-12 flex justify-between items-center">
+      <div className="flex justify-between items-center">
         <Button variant="outline" className="flex items-center space-x-2">
           <Settings className="h-4 w-4" />
           <span>Settings</span>

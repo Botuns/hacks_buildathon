@@ -80,9 +80,9 @@ export default function AIVoiceChat() {
   const startCall = () => {
     setCallStatus("ringing");
     if (!beepRef.current) {
-      beepRef.current = new Audio(
-        "https://www.soundsnap.com/play?t=e&p=files/audio/47/23154-phone-tones-2.mp3"
-      );
+      beepRef.current = new Audio("/calling.mp3");
+      //         "https://www.soundsnap.com/play?t=e&p=files/audio/47/23154-phone-tones-2.mp3"
+
       beepRef.current.loop = true;
     }
     beepRef.current.play();
@@ -92,7 +92,7 @@ export default function AIVoiceChat() {
         beepRef.current.pause();
         beepRef.current.currentTime = 0;
       }
-      const initialMessage = "Hello! How can I assist you today?";
+      const initialMessage = "Hello, I am Eduifa! How can I assist you today?";
       setMessages([{ text: initialMessage, isUser: false }]);
       speak(initialMessage);
     }, 3000);
@@ -222,10 +222,12 @@ export default function AIVoiceChat() {
   }, [isListening]);
 
   return (
-    <Card className="w-full max-w-md mx-auto">
+    <Card className="w-full max-w-md mx-auto md:max-w-[80%]">
       <CardContent className="p-6">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold">AI Voice Chat</h2>
+          <h2 className="text-2xl font-bold">
+            Have a Conversation with Eduifa
+          </h2>
           {callStatus === "idle" ? (
             <Button
               onClick={startCall}

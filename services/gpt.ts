@@ -106,3 +106,40 @@ export async function OpenAiGptVoicechat(prompt: string, systemPrompt: string) {
     return [];
   }
 }
+
+export async function OpenAiGptChat(prompt: string, systemPrompt: string) {
+  try {
+    const messages = { role: "user", content: prompt };
+
+    const response = await axios.post(
+      `${BASE_URL}/knowledge-base`,
+      {
+        model: "gpt-4o-mini",
+        messages: [
+          {
+            role: "system",
+            content: systemPrompt,
+          },
+          messages,
+        ],
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    console.log(response);
+
+    const AIRESULT = response?.data.data.choices[0].message;
+    const generatedContent = AIRESULT?.content;
+    // const formattedData = JSON.parse(generatedContent);
+
+    return generatedContent;
+  } catch (error) {
+    console.error("Error while fetching AI response:", error);
+    return "";
+  }
+}
+

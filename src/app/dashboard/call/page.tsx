@@ -62,6 +62,7 @@ export default function AIVoiceChat() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const beepRef = useRef<HTMLAudioElement | null>(null);
   // @ts-ignore
   const recognitionRef = useRef<SpeechRecognition | null>(null);
   const synthRef = useRef<SpeechSynthesis | null>(null);
@@ -78,12 +79,23 @@ export default function AIVoiceChat() {
 
   const startCall = () => {
     setCallStatus("ringing");
+    if (!beepRef.current) {
+      beepRef.current = new Audio(
+        "https://www.soundsnap.com/play?t=e&p=files/audio/47/23154-phone-tones-2.mp3"
+      );
+      beepRef.current.loop = true;
+    }
+    beepRef.current.play();
     setTimeout(() => {
       setCallStatus("active");
+      if (beepRef.current) {
+        beepRef.current.pause();
+        beepRef.current.currentTime = 0;
+      }
       const initialMessage = "Hello! How can I assist you today?";
       setMessages([{ text: initialMessage, isUser: false }]);
       speak(initialMessage);
-    }, 2000);
+    }, 3000);
   };
 
   const endCall = () => {
@@ -110,18 +122,62 @@ export default function AIVoiceChat() {
     }
   };
 
+  // const speak = (text: string) => {
+  //   if (synthRef.current) {
+  //     setIsSpeaking(true);
+  //     setShowModal(true);
+  //     const utterance = new SpeechSynthesisUtterance(text);
+  //     utterance.onend = () => {
+  //       setIsSpeaking(false);
+  //     };
+  //     synthRef.current.speak(utterance);
+  //   }
+  // };
   const speak = (text: string) => {
     if (synthRef.current) {
       setIsSpeaking(true);
       setShowModal(true);
+
       const utterance = new SpeechSynthesisUtterance(text);
+
+      utterance.lang = "en-GB";
+      utterance.pitch = 1;
+      utterance.rate = 1;
+      utterance.volume = 1;
+
+      const voices = synthRef.current.getVoices();
+
+      const preferredVoices = [
+        "Google UK English Female",
+        "Google UK English Male",
+        "Microsoft Zira - English (United States)",
+        "Google US English",
+      ];
+
+      const selectedVoice = voices.find((voice) =>
+        preferredVoices.includes(voice.name)
+      );
+
+      if (selectedVoice) {
+        utterance.voice = selectedVoice;
+        console.log(`Using voice: ${selectedVoice.name}`);
+
+        if (selectedVoice.lang !== "en-GB") {
+          utterance.lang = selectedVoice.lang;
+        }
+      } else {
+        console.warn(
+          "None of the preferred voices found. Using default voice."
+        );
+      }
+
       utterance.onend = () => {
         setIsSpeaking(false);
       };
+
       synthRef.current.speak(utterance);
     }
   };
-
   const getAIResponse = async (userMessage: string) => {
     setIsLoading(true);
     try {
@@ -129,9 +185,9 @@ export default function AIVoiceChat() {
         "You are a helpful AI assistant in a voice chat. Provide concise and relevant responses.";
       const aiResponse = await OpenAiGptVoicechat(userMessage, systemPrompt);
 
-      if (Array.isArray(aiResponse) && aiResponse.length > 0) {
+      if (aiResponse) {
         const responseText =
-          aiResponse[0].text || "I'm sorry, I couldn't generate a response.";
+          aiResponse || "I'm sorry, I couldn't generate a response.";
         setMessages((prev) => [...prev, { text: responseText, isUser: false }]);
         speak(responseText);
       } else {

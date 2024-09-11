@@ -94,12 +94,13 @@ export async function OpenAiGptVoicechat(prompt: string, systemPrompt: string) {
         },
       }
     );
+    console.log(response);
 
-    const AIRESULT = response?.data?.data?.choices[0]?.message;
+    const AIRESULT = response?.data.data.choices[0].message;
     const generatedContent = AIRESULT?.content;
-    const formattedData = JSON.parse(generatedContent);
+    // const formattedData = JSON.parse(generatedContent);
 
-    return formattedData;
+    return generatedContent;
   } catch (error) {
     console.error("Error while fetching AI response:", error);
     return [];

@@ -27,7 +27,7 @@ import {
 import { getUserCourses } from "../helpers/queries";
 import { Course } from "@prisma/client";
 
-export default function Component() {
+export default function DashboardBody() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");

@@ -11,6 +11,7 @@ import { OpenAiGptChat } from "../../services/gpt";
 export async function extractTextFromPDF(file: File): Promise<string> {
   try {
     const text = await pdfToText(file);
+    console.log(file, text);
     if (!text) {
       throw new Error("No text extracted from the PDF");
     }

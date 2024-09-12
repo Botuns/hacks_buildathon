@@ -29,7 +29,7 @@ export default function SideBar() {
   const [isOpen, setIsOpen] = useState(false);
 
   const navItems = [
-    { href: "#", icon: Grid, label: "Dashboard" },
+    { href: "/dashboard", icon: Grid, label: "Dashboard" },
     { href: "/dashboard/learn", icon: Book, label: "Study" },
     { href: "#", icon: Search, label: "Search" },
     { href: "#", icon: Folder, label: "Projects" },
@@ -38,7 +38,7 @@ export default function SideBar() {
     { href: "#", icon: Rocket, label: "AI Exams" },
     { href: "/dashboard/call", icon: Mic, label: "Voice Tutor" },
     { href: "#", icon: BookOpen, label: "Explainers" },
-    { href: "#", icon: FileText, label: "PDF/Q&A" },
+    { href: "/dashboard/chat-with-pdf", icon: FileText, label: "PDF/Q&A" },
     { href: "#", icon: Cloud, label: "Photos" },
     { href: "#", icon: CloudLightning, label: "Groups" },
     { href: "#", icon: Bell, label: "Notifications" },
@@ -62,20 +62,35 @@ export default function SideBar() {
       </div>
       <ScrollArea className="flex-1 px-2">
         <nav className="flex flex-col gap-1 mt-[1%]">
-          {navItems.map((item, index) => (
-            <Link key={index} href={item.href} prefetch={false}>
+          {navItems.map((item, index) =>
+            item.href === "#" ? (
               <Button
-                variant={index === 0 ? "default" : "ghost"}
+                key={index}
+                variant="ghost"
                 className={cn(
-                  "w-full justify-start gap-2",
+                  "w-full justify-start gap-2 cursor-not-allowed opacity-50",
                   index === 0 && "bg-primary text-primary-foreground"
                 )}
+                disabled
               >
                 <item.icon className="h-4 w-4" />
                 {item.label}
               </Button>
-            </Link>
-          ))}
+            ) : (
+              <Link key={index} href={item.href} prefetch={false}>
+                <Button
+                  variant={index === 0 ? "default" : "ghost"}
+                  className={cn(
+                    "w-full justify-start gap-2",
+                    index === 0 && "bg-primary text-primary-foreground"
+                  )}
+                >
+                  <item.icon className="h-4 w-4" />
+                  {item.label}
+                </Button>
+              </Link>
+            )
+          )}
         </nav>
       </ScrollArea>
     </div>

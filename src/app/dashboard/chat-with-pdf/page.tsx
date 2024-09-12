@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback, useRef } from "react";
+import React, { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -8,27 +8,33 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
-import { ChevronRight, Upload, Send, Loader2, Download } from "lucide-react";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+  ChevronRight,
+  Upload,
+  Send,
+  Loader2,
+  Download,
+  ChevronLeft,
+} from "lucide-react";
+import { Document, Page, pdfjs } from "react-pdf";
+import { toast, Toaster } from "sonner";
+import { jsPDF } from "jspdf";
+import { MDXRemote } from "next-mdx-remote";
+import mdxComponents from "@/components/mdxComponents";
+import { serialize } from "next-mdx-remote/serialize";
+import html2canvas from "html2canvas";
+import ReactDOMServer from "react-dom/server";
+
+// pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
 import {
   chatWithPDF,
   extractTextFromPDF,
   generateQuestions,
 } from "@/lib/pdf-utils";
-import { toast, Toaster } from "sonner";
-import { Document, Page, pdfjs } from "react-pdf";
 
 export default function ChatWithPDF() {
-  const [pageNumber, setPageNumber] = useState(1);
   const [pdfFile, setPdfFile] = useState<File | null>(null);
-
   const [pdfText, setPdfText] = useState<string>("");
   const [messages, setMessages] = useState<
     { role: "user" | "assistant"; content: string }[]
@@ -39,7 +45,9 @@ export default function ChatWithPDF() {
   const [difficulty, setDifficulty] = useState("medium");
   const [generatedQuestions, setGeneratedQuestions] = useState<string>("");
   const [numPages, setNumPages] = useState<number | null>(null);
+  const [pageNumber, setPageNumber] = useState(1);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
 
   const handleFileUpload = async (
     event: React.ChangeEvent<HTMLInputElement>
@@ -51,11 +59,9 @@ export default function ChatWithPDF() {
       const text = await extractTextFromPDF(file);
       setPdfText(text);
       setPdfFile(file);
-      //   notification.success({ message:  });
-      toast.success("Text extracted successfully");
+      toast.success("PDF uploaded and text extracted successfully");
     } catch (error) {
       console.error("Failed to extract text from PDF:", error);
-      //   notification.error({ message: "Failed to extract text from PDF" });
       toast.error("Failed to extract text from PDF");
     } finally {
       setIsLoading(false);
@@ -77,9 +83,12 @@ export default function ChatWithPDF() {
         ...prev,
         { role: "assistant", content: response },
       ]);
+      if (chatContainerRef.current) {
+        chatContainerRef.current.scrollTop =
+          chatContainerRef.current.scrollHeight;
+      }
     } catch (error) {
       console.error("Error chatting with PDF:", error);
-      //   notification.error({ message: "Failed to process your question" });
       toast.error("Failed to process your question");
     } finally {
       setIsLoading(false);
@@ -96,58 +105,109 @@ export default function ChatWithPDF() {
         difficulty
       );
       setGeneratedQuestions(questions);
-      //   notification.success({ message: "Questions generated successfully" });
       toast.success("Questions generated successfully");
     } catch (error) {
       console.error("Error generating questions:", error);
-      //   notification.error({ message: "Failed to generate questions" });
       toast.error("Failed to generate questions");
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleDownloadQuestions = () => {
-    if (!generatedQuestions) return;
-    const element = document.createElement("a");
-    const file = new Blob([generatedQuestions], { type: "text/markdown" });
-    element.href = URL.createObjectURL(file);
-    element.download = "generated_questions.md";
-    document.body.appendChild(element);
-    element.click();
-    document.body.removeChild(element);
-  };
+  //   const handleDownloadQuestions = () => {
+  //     if (!generatedQuestions) return;
+  //     const doc = new jsPDF();
+  //     const splitText = doc.splitTextToSize(generatedQuestions, 180);
+  //     doc.text(splitText, 15, 15);
+  //     doc.save("generated_questions.pdf");
+  //   };
+
   const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
     setNumPages(numPages);
     setPageNumber(1);
   };
+
+  const handleDownloadQuestions = async (serializedMdxContent: any) => {
+    if (!serializedMdxContent) return;
+
+    const container = document.createElement("div");
+    document.body.appendChild(container);
+
+    const mdxElement = (
+      <MDXRemote {...serializedMdxContent} components={mdxComponents} />
+    );
+    container.innerHTML = ReactDOMServer.renderToString(mdxElement);
+
+    const canvas = await html2canvas(container);
+
+    document.body.removeChild(container);
+
+    const imgData = canvas.toDataURL("image/png");
+    const pdf = new jsPDF("p", "mm", "a4");
+
+    const margin = 15;
+
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = pdf.internal.pageSize.getHeight();
+
+    const imgProps = pdf.getImageProperties(imgData);
+    const imgWidth = imgProps.width;
+    const imgHeight = imgProps.height;
+
+    const scale = Math.min(
+      (pdfWidth - 2 * margin) / imgWidth,
+      (pdfHeight - 2 * margin) / imgHeight
+    );
+
+    const imgScaledWidth = imgWidth * scale;
+    const imgScaledHeight = imgHeight * scale;
+    const xOffset = (pdfWidth - imgScaledWidth) / 2;
+    const yOffset = (pdfHeight - imgScaledHeight) / 2;
+
+    pdf.addImage(
+      imgData,
+      "PNG",
+      xOffset,
+      yOffset,
+      imgScaledWidth,
+      imgScaledHeight
+    );
+
+    pdf.save("generated_questions.pdf");
+  };
+  const prepareDownload = async () => {
+    const serializedMdxContent = await serialize(generatedQuestions);
+
+    handleDownloadQuestions(serializedMdxContent);
+  };
   return (
-    <div className="container mx-auto p-4 max-w-6xl">
+    <div className="container mx-auto p-4 max-w-7xl">
       <Toaster richColors />
-      <h1 className="text-3xl font-bold mb-6">
-        {" "}
-        Hi, I am Eduifa and I help you understand your pdf
+      <h1 className="text-3xl font-bold mb-6 text-center">
+        👋 Hi! I&apos;m EduIfa, your AI assistant 🤖
       </h1>
-      <div className="flex gap-4">
-        <Card className="w-1/2 h-[calc(100vh-10rem)]">
-          <CardContent className="p-4">
+      <div className="flex flex-col md:flex-row gap-4">
+        <Card className="w-full md:w-1/2 h-[calc(100vh-12rem)]">
+          <CardContent className="p-4 h-full">
             {pdfFile ? (
-              <div className="h-full overflow-auto">
-                <Document
-                  file={pdfFile}
-                  onLoadSuccess={onDocumentLoadSuccess}
-                  className="h-full"
-                >
-                  <Page pageNumber={pageNumber} />
-                </Document>
-                <div className="mt-4 flex justify-between">
+              <div className="h-full flex flex-col">
+                <div className="flex-grow overflow-auto">
+                  <Document
+                    file={pdfFile}
+                    onLoadSuccess={onDocumentLoadSuccess}
+                    className="h-full"
+                  >
+                    <Page pageNumber={pageNumber} width={450} />
+                  </Document>
+                </div>
+                <div className="mt-4 flex justify-between items-center">
                   <Button
                     onClick={() =>
                       setPageNumber((page) => Math.max(page - 1, 1))
                     }
                     disabled={pageNumber <= 1}
                   >
-                    Previous
+                    <ChevronLeft className="w-4 h-4 mr-2" /> Previous
                   </Button>
                   <span>
                     Page {pageNumber} of {numPages}
@@ -158,7 +218,7 @@ export default function ChatWithPDF() {
                     }
                     disabled={pageNumber >= (numPages || 1)}
                   >
-                    Next
+                    Next <ChevronRight className="w-4 h-4 ml-2" />
                   </Button>
                 </div>
               </div>
@@ -184,14 +244,17 @@ export default function ChatWithPDF() {
             )}
           </CardContent>
         </Card>
-        <Card className="w-1/2 h-[calc(100vh-10rem)] flex flex-col">
+        <Card className="w-full md:w-1/2 h-[calc(100vh-12rem)] flex flex-col">
           <Tabs defaultValue="chat" className="flex-grow flex flex-col">
             <TabsList className="w-full justify-start">
               <TabsTrigger value="chat">Chat</TabsTrigger>
               <TabsTrigger value="generate">Generate Questions</TabsTrigger>
             </TabsList>
             <TabsContent value="chat" className="flex-grow flex flex-col p-4">
-              <div className="flex-grow overflow-auto mb-4">
+              <div
+                ref={chatContainerRef}
+                className="flex-grow overflow-auto mb-4 pr-2"
+              >
                 {messages.map((message, index) => (
                   <div
                     key={index}
@@ -230,7 +293,7 @@ export default function ChatWithPDF() {
                 </Button>
               </div>
             </TabsContent>
-            <TabsContent value="generate" className="p-4">
+            <TabsContent value="generate" className="p-4 overflow-auto">
               <div className="space-y-4">
                 <div>
                   <Label htmlFor="question-count">Number of Questions</Label>
@@ -263,24 +326,25 @@ export default function ChatWithPDF() {
                   className="w-full"
                   disabled={isLoading || !pdfText}
                 >
-                  Generate Questions
+                  {!isLoading ? (
+                    "Generate Questions"
+                  ) : (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  )}
                 </Button>
                 {generatedQuestions && (
                   <div>
                     <h3 className="text-lg font-semibold mb-2">
                       Generated Questions:
                     </h3>
-                    <div className="bg-gray-100 p-4 rounded-lg mb-4">
+                    <div className="bg-gray-100 p-4 rounded-lg mb-4 max-h-60 overflow-auto">
                       <pre className="whitespace-pre-wrap">
                         {generatedQuestions}
                       </pre>
                     </div>
-                    <Button
-                      onClick={handleDownloadQuestions}
-                      className="w-full"
-                    >
+                    <Button onClick={prepareDownload} className="w-full">
                       <Download className="w-4 h-4 mr-2" />
-                      Download Questions (MDX)
+                      Download Questions (PDF)
                     </Button>
                   </div>
                 )}

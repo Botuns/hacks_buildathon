@@ -84,3 +84,29 @@ export async function getCourse(courseId: string) {
     };
   }
 }
+export async function signIn(email: string, password: string) {
+  try {
+    const user = await db.user.findUnique({
+      where: { email: email },
+    });
+
+    if (!user) {
+      return { success: false, error: "Invalid email or password", data: null };
+    }
+
+    const isPasswordValid = password === user.password;
+
+    if (!isPasswordValid) {
+      return { success: false, error: "Invalid email or password", data: null };
+    }
+
+    return { success: true, error: null, data: user };
+  } catch (error) {
+    logError("signIn", error);
+    return {
+      success: false,
+      error: "An unexpected error occurred",
+      data: null,
+    };
+  }
+}

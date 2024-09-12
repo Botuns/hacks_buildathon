@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import { getUserCourses } from "../helpers/queries";
 import { Course } from "@prisma/client";
+import { getUserFromLocalStorage } from "../helpers/user";
 
 export default function DashboardBody() {
   const [courses, setCourses] = useState<Course[]>([]);
@@ -41,8 +42,11 @@ export default function DashboardBody() {
     async function fetchCourses() {
       setLoading(true);
       try {
-        const userId = "e01ef169-0248-436b-a4fd-6a53c78e5990";
-        const response = await getUserCourses(userId);
+        // const userId = "e01ef169-0248-436b-a4fd-6a53c78e5990";
+        // const { user } = useUser();
+        const user = getUserFromLocalStorage();
+        // @ts-ignore
+        const response = await getUserCourses(user.id ?? "");
         console.log("response", response);
         if (response.success && response.data) {
           setCourses(response.data);
@@ -85,8 +89,8 @@ export default function DashboardBody() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Courses</CardTitle>
-            <Book className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium text-primary">Total Courses</CardTitle>
+            <Book className="h-4 w-4 text-muted-foreground text-primary" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{courses.length}</div>
@@ -94,10 +98,10 @@ export default function DashboardBody() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
+            <CardTitle className="text-sm font-medium text-primary">
               Completed Courses
             </CardTitle>
-            <Trophy className="h-4 w-4 text-muted-foreground" />
+            <Trophy className="h-4 w-4 text-muted-foreground text-primary" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
@@ -111,7 +115,7 @@ export default function DashboardBody() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
+            <CardTitle className="text-sm font-medium text-primary">
               Overall Progress
             </CardTitle>
             <Progress value={overallProgress} className="w-[60px]" />
@@ -128,7 +132,7 @@ export default function DashboardBody() {
             variant="outline"
             className="h-24 flex flex-col items-center justify-center space-y-2"
           >
-            <Mic className="h-6 w-6" />
+            <Mic className="h-6 w-6 text-primary" />
             <span>Voice Call with AI</span>
           </Button>
           <Button
@@ -136,14 +140,15 @@ export default function DashboardBody() {
             className="h-24 flex flex-col items-center justify-center space-y-2"
             onClick={() => Navigate("/dashboard/call")}
           >
-            <MessageSquare className="h-6 w-6" />
+            <MessageSquare className="h-6 w-6 text-primary" />
             <span>Chat with AI</span>
           </Button>
           <Button
             variant="outline"
             className="h-24 flex flex-col items-center justify-center space-y-2"
+            onClick={() => Navigate("/dashboard/chat-with-pdf")}
           >
-            <FileText className="h-6 w-6" />
+            <FileText className="h-6 w-6 text-primary" />
             <span>Chat with PDF</span>
           </Button>
         </div>

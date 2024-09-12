@@ -1,7 +1,10 @@
 // @/lib/pdf-utils.ts
 
-import pdfToText from "react-pdftotext";
 import { OpenAiGptChat } from "../../services/gpt";
+import * as pdfjsLib from "pdfjs-dist";
+import "pdfjs-dist/build/pdf.worker.entry";
+
+// pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 
 /**
  * Extracts text content from a PDF file
@@ -10,12 +13,23 @@ import { OpenAiGptChat } from "../../services/gpt";
  */
 export async function extractTextFromPDF(file: File): Promise<string> {
   try {
-    const text = await pdfToText(file);
-    console.log(file, text);
-    if (!text) {
+    const arrayBuffer = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    let fullText = "";
+
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const textContent = await page.getTextContent();
+      const pageText = textContent.items.map((item: any) => item.str).join(" ");
+      fullText += pageText + "\n";
+    }
+
+    if (!fullText.trim()) {
       throw new Error("No text extracted from the PDF");
     }
-    return text;
+
+    // console.log("PDF text extracted:", fullText);
+    return fullText;
   } catch (error) {
     console.error("Error extracting text from PDF:", error);
     throw new Error("Failed to extract text from PDF");

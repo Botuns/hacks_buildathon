@@ -1,5 +1,7 @@
+// @ts-nocheck
 "use client";
 
+// @ts-nocheck
 import React, { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,6 +18,7 @@ import {
   Download,
   ChevronLeft,
 } from "lucide-react";
+// import { Document, Page, pdfjs } from "react-pdf";
 import { toast, Toaster } from "sonner";
 import { jsPDF } from "jspdf";
 import { MDXRemote } from "next-mdx-remote";
@@ -23,7 +26,8 @@ import mdxComponents from "@/components/mdxComponents";
 import { serialize } from "next-mdx-remote/serialize";
 import html2canvas from "html2canvas";
 import ReactDOMServer from "react-dom/server";
-import dynamic from "next/dynamic";
+
+// pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
 import {
   chatWithPDF,
@@ -31,20 +35,10 @@ import {
   generateQuestions,
 } from "@/lib/pdf-utils";
 
-const Viewer = dynamic(
-  () => import("@react-pdf-viewer/core").then((module) => module.Viewer),
-  { ssr: false }
-);
-// @ts-ignore
-const { Worker } = dynamic(() => import("@react-pdf-viewer/core"), {
-  ssr: false,
-});
-
-import "@react-pdf-viewer/core/lib/styles/index.css";
-
 export default function ChatWithPDF() {
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [pdfText, setPdfText] = useState<string>("");
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [messages, setMessages] = useState<
     { role: "user" | "assistant"; content: string }[]
   >([]);
@@ -53,6 +47,8 @@ export default function ChatWithPDF() {
   const [questionCount, setQuestionCount] = useState(5);
   const [difficulty, setDifficulty] = useState("medium");
   const [generatedQuestions, setGeneratedQuestions] = useState<string>("");
+  const [numPages, setNumPages] = useState<number | null>(null);
+  const [pageNumber, setPageNumber] = useState(1);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
@@ -66,6 +62,7 @@ export default function ChatWithPDF() {
       const text = await extractTextFromPDF(file);
       setPdfText(text);
       setPdfFile(file);
+      setPdfUrl(URL.createObjectURL(file));
       toast.success("PDF uploaded and text extracted successfully");
     } catch (error) {
       console.error("Failed to extract text from PDF:", error);
@@ -121,6 +118,19 @@ export default function ChatWithPDF() {
     }
   };
 
+  //   const handleDownloadQuestions = () => {
+  //     if (!generatedQuestions) return;
+  //     const doc = new jsPDF();
+  //     const splitText = doc.splitTextToSize(generatedQuestions, 180);
+  //     doc.text(splitText, 15, 15);
+  //     doc.save("generated_questions.pdf");
+  //   };
+
+  // const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
+  //   setNumPages(numPages);
+  //   setPageNumber(1);
+  // };
+
   const handleDownloadQuestions = async (serializedMdxContent: any) => {
     if (!serializedMdxContent) return;
 
@@ -169,12 +179,11 @@ export default function ChatWithPDF() {
 
     pdf.save("generated_questions.pdf");
   };
-
   const prepareDownload = async () => {
     const serializedMdxContent = await serialize(generatedQuestions);
+
     handleDownloadQuestions(serializedMdxContent);
   };
-
   return (
     <div className="container mx-auto p-4 max-w-7xl">
       <Toaster richColors />
@@ -184,16 +193,12 @@ export default function ChatWithPDF() {
       <div className="flex flex-col md:flex-row gap-4">
         <Card className="w-full md:w-1/2 h-[calc(100vh-12rem)]">
           <CardContent className="p-4 h-full">
-            {pdfFile ? (
-              <div className="h-full flex flex-col">
-                <div className="flex-grow overflow-auto">
-                  <Worker
-                    workerUrl={`https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.min.js`}
-                  >
-                    <Viewer fileUrl={URL.createObjectURL(pdfFile)} />
-                  </Worker>
-                </div>
-              </div>
+            {pdfFile && pdfUrl ? (
+              <iframe
+                src={pdfUrl}
+                className="w-full h-full border-none"
+                title="PDF Viewer"
+              />
             ) : (
               <div className="flex items-center justify-center h-full border-2 border-dashed border-gray-300 rounded-lg">
                 <label htmlFor="pdf-upload" className="cursor-pointer">
@@ -217,8 +222,8 @@ export default function ChatWithPDF() {
           </CardContent>
         </Card>
         <Card className="w-full md:w-1/2 h-[calc(100vh-12rem)] flex flex-col">
-          <Tabs defaultValue="chat" className="flex-grow flex flex-col">
-            <TabsList className="w-full justify-start">
+          <Tabs defaultValue="chat" className="flex-grow flex flex-col ">
+            <TabsList className="w-full justify-start bg-primary text-white">
               <TabsTrigger value="chat">Chat</TabsTrigger>
               <TabsTrigger value="generate">Generate Questions</TabsTrigger>
             </TabsList>

@@ -31,6 +31,11 @@ const nextConfig = {
     ],
   },
   transpilePackages: ["next-mdx-remote"],
+  webpack: (config) => {
+    config.resolve.alias.canvas = false;
+    config.resolve.alias.encoding = false;
+    return config;
+  },
 };
 
 const withMDX = createMDX({

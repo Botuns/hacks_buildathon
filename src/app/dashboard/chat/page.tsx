@@ -221,22 +221,14 @@ const ChatwithEduifa = () => {
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold">Chat with Eduifa</h1>
         <div className="flex items-center space-x-2">
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setIsPromptDialogOpen(true)}
-                >
-                  <Plus className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Edit System Prompt</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setIsPromptDialogOpen(true)}
+          >
+            <Plus className="h-4 w-4" />
+          </Button>
+
           <Switch
             checked={theme === "dark"}
             onCheckedChange={() =>

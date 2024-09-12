@@ -17,7 +17,7 @@ import {
   Download,
   ChevronLeft,
 } from "lucide-react";
-import { Document, Page, pdfjs } from "react-pdf";
+import { Document, Page } from "react-pdf";
 import { toast, Toaster } from "sonner";
 import { jsPDF } from "jspdf";
 import { MDXRemote } from "next-mdx-remote";
@@ -266,7 +266,7 @@ export default function ChatWithPDF() {
                     <span
                       className={`inline-block p-2 rounded-lg ${
                         message.role === "user"
-                          ? "bg-blue-500 text-white"
+                          ? "bg-blue-600 text-white"
                           : "bg-gray-200"
                       }`}
                     >

@@ -221,14 +221,22 @@ const ChatwithEduifa = () => {
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold">Chat with Eduifa</h1>
         <div className="flex items-center space-x-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setIsPromptDialogOpen(true)}
-          >
-            <Plus className="h-4 w-4" />
-          </Button>
-
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setIsPromptDialogOpen(true)}
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Edit System Prompt</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
           <Switch
             checked={theme === "dark"}
             onCheckedChange={() =>
@@ -286,27 +294,31 @@ const ChatwithEduifa = () => {
           <Send className="h-4 w-4 mr-2" />
           Send
         </Button>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button onClick={handleSave}>
-              <Save className="h-4 w-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Save Chat</p>
-          </TooltipContent>
-        </Tooltip>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            {/* @ts-ignore */}
-            <Button onClick={() => fileInputRef.current?.click()}>
-              <Upload className="h-4 w-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Load Chat</p>
-          </TooltipContent>
-        </Tooltip>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button onClick={handleSave}>
+                <Save className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Save Chat</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              {/* @ts-ignore */}
+              <Button onClick={() => fileInputRef.current?.click()}>
+                <Upload className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Load Chat</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
         <input
           type="file"
           ref={fileInputRef}
@@ -314,16 +326,18 @@ const ChatwithEduifa = () => {
           style={{ display: "none" }}
           accept=".json"
         />
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button onClick={() => setMessages([])}>
-              <RotateCcw className="h-4 w-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Clear Chat</p>
-          </TooltipContent>
-        </Tooltip>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button onClick={() => setMessages([])}>
+                <RotateCcw className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Clear Chat</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </div>
 
       <Dialog open={isPromptDialogOpen} onOpenChange={setIsPromptDialogOpen}>

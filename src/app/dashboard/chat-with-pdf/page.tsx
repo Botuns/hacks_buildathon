@@ -1,6 +1,7 @@
 // @ts-nocheck
 "use client";
 
+// @ts-nocheck
 import React, { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

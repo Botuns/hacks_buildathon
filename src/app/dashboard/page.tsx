@@ -89,7 +89,9 @@ export default function DashboardBody() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-primary">Total Courses</CardTitle>
+            <CardTitle className="text-sm font-medium text-primary">
+              Total Courses
+            </CardTitle>
             <Book className="h-4 w-4 text-muted-foreground text-primary" />
           </CardHeader>
           <CardContent>
@@ -131,6 +133,7 @@ export default function DashboardBody() {
           <Button
             variant="outline"
             className="h-24 flex flex-col items-center justify-center space-y-2"
+            onClick={() => Navigate("/dashboard/call")}
           >
             <Mic className="h-6 w-6 text-primary" />
             <span>Voice Call with AI</span>
@@ -138,7 +141,7 @@ export default function DashboardBody() {
           <Button
             variant="outline"
             className="h-24 flex flex-col items-center justify-center space-y-2"
-            onClick={() => Navigate("/dashboard/call")}
+            onClick={() => Navigate("/dashboard/chat")}
           >
             <MessageSquare className="h-6 w-6 text-primary" />
             <span>Chat with AI</span>
@@ -204,6 +207,11 @@ export default function DashboardBody() {
                 </CardContent>
               </Card>
             ))}
+          </div>
+        )}
+        {filteredCourses.length === 0 && (
+          <div className="text-center text-muted-foreground">
+            No courses found. 
           </div>
         )}
       </div>

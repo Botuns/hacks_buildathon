@@ -32,7 +32,7 @@ export type CourseContent = {
 
 const BASE_URL = "https://golive.gmind.ai/v1"; // New base URL
 const token =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjU0MzhmN2VjNTJlNzkzMWU2MzA2ZTUzIiwiZW1haWwiOiJpYW10aGF0anVqdW1hbkBnbWFpbC5jb20ifSwiaWF0IjoxNzIzNjQ3MjU4LCJleHAiOjE3MzE0MjMyNTh9.T1KYhVyhZdvBPlEIR4vVqEEhXnQHlIH-h-Jn9hCc4Ms"; // Replace with your token
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjU0MzhmN2VjNTJlNzkzMWU2MzA2ZTUzIiwiZW1haWwiOiJpYW10aGF0anVqdW1hbkBnbWFpbC5jb20ifSwiaWF0IjoxNzI3OTAwODI2LCJleHAiOjE3MzU2NzY4MjZ9.WUi56zep3FrKX6zjwqoL-Kvt3LaZ3O_vDTAejkIlpXQ";
 
 export async function OpenAiGpt(prompt: string) {
   try {

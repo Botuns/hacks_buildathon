@@ -1,3 +1,5 @@
+import { DifficultyLevel } from "@/lib/exam";
+
 export function refined_learn_generator_prompt(
   values: any,
   videoUrls: any,
@@ -81,4 +83,52 @@ export function refined_learn_generator_prompt(
     }
       and Only return the JSON object formatted correctly without any extra text or explanations.
   `;
+}
+
+export function generateExamPrompt(
+  difficulty: DifficultyLevel,
+  className: string,
+  description: string,
+  numberOfQuestions: number
+): string {
+  const prompt = `
+Generate a structured JSON object for an exam with the following details:
+
+- Difficulty: ${difficulty}
+- Class: ${className}
+- Description: ${description}
+- Number of Questions: ${numberOfQuestions}
+
+The JSON object should follow this structure:
+
+{
+  "id": string,
+  "title": string,
+  "description": string,
+  "questions": [
+    {
+      "id": string,
+      "text": string,
+      "options": string[],
+      "correctOptionIndex": number
+    }
+  ],
+  "timeLimit": number,
+  "difficultyLevel": "${difficulty}"
+}
+
+Ensure that:
+1. The exam title is relevant to the class name.
+2. The time limit is appropriate for the difficulty and number of questions (Easy: 1 minute per question, Medium: 1.5 minutes per question, Hard: 2 minutes per question).
+3. Each question has a unique ID (e.g., Q1, Q2, etc.).
+4. Each question has exactly 4 options.
+5. The correctOptionIndex is a valid index (0-4) for the options array.
+6. The questions are relevant to the class and difficulty level.
+
+Generate the JSON object without any additional text or explanations,Generate JSON only, with no extra text or explanations, just the structured output.
+    Provide sample questions appropriate to the class and difficulty level..
+    I repeat for noting again, be strict with your output and make sure you follow the given format and instructions, and please remove the '\`\'"\`\`\`json...\`\`\`'\"'\`\' from the output because i would not be able to parse it. just the correct json format please be strict with the rules and also for no reason should you wrap the json inside "". just start withthe { and end with the }
+`;
+
+  return prompt;
 }

@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { PhoneCall, PhoneOff, Mic, MicOff } from "lucide-react";
 import axios from "axios";
-import { OpenAiGptVoicechat } from "../../../../services/gpt";
+import { OpenAi } from "../../../../services/gpt";
 
 // const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 // const token = process.env.NEXT_PUBLIC_API_TOKEN;
@@ -183,7 +183,7 @@ export default function AIVoiceChat() {
     try {
       const systemPrompt =
         "You are a helpful AI assistant in a voice chat. Provide concise and relevant responses.";
-      const aiResponse = await OpenAiGptVoicechat(userMessage, systemPrompt);
+      const aiResponse = await OpenAi(userMessage, systemPrompt);
 
       if (aiResponse) {
         const responseText =

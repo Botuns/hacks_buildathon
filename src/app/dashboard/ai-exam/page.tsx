@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -21,22 +22,51 @@ import {
   Hash,
   MessageSquare,
 } from "lucide-react";
+import { generateExam } from "@/app/helpers";
+import { DifficultyLevel } from "@/lib/exam";
+import { toast } from "sonner";
+import { useExamStore } from "@/app/hooks/providers/examStore";
+import { Loader } from "rsuite";
 
 export default function ExamGeneratorPage() {
+  const router = useRouter();
+  const { startExam } = useExamStore();
   const [formData, setFormData] = useState({
     difficulty: "",
     class: "",
     questionCount: 10,
     aiPrompt: "",
   });
+  const [loading, setLoading] = useState(false);
 
   const handleFormChange = (key: string, value: string | number) => {
     setFormData((prev) => ({ ...prev, [key]: value }));
   };
 
-  const handleSubmit = () => {
-    console.log("Generating exam with data:", formData);
-    // Here you would typically call your API to generate the exam
+  const handleSubmit = async () => {
+    // console.log("Generating exam with data:", formData);
+    setLoading(true);
+    try {
+      const exam = await generateExam(
+        formData.difficulty as DifficultyLevel,
+        formData.class,
+        formData.aiPrompt,
+        formData.questionCount
+      );
+      if (!exam.title) {
+        toast.error("Failed to generate exam");
+        return;
+      }
+      // save exa to zustand store
+      startExam(exam);
+      toast.success("Exam generated successfully");
+      router.push("ai-exam/start");
+    } catch (error: any) {
+      console.error("Failed to generate exam:", error);
+      toast.error(error.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -60,7 +90,7 @@ export default function ExamGeneratorPage() {
               value={formData.aiPrompt}
               onChange={(value) => handleFormChange("aiPrompt", value)}
             />
-            <GenerateButton onClick={handleSubmit} />
+            <GenerateButton onClick={handleSubmit} loading={loading} />
           </CardContent>
         </Card>
       </motion.div>
@@ -192,13 +222,30 @@ function AIPromptInput({
   );
 }
 
-function GenerateButton({ onClick }: { onClick: () => void }) {
+interface GenerateButtonProps {
+  onClick: () => void;
+  loading: boolean;
+}
+
+export function GenerateButton({ onClick, loading }: GenerateButtonProps) {
   return (
     <Button
       onClick={onClick}
-      className="w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600 transition-all duration-300"
+      disabled={loading}
+      className="w-full bg-gradient-to-r from-primary to-purple-500 text-white hover:from-blue-600 hover:to-purple-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
     >
-      Generate Exam
+      {loading ? (
+        <div>
+          <Loader 
+            // size="sm"
+            content="Generating..."
+            speed="slow"
+            className="!text-white"
+          />
+        </div>
+      ) : (
+        "Generate Exam"
+      )}
     </Button>
   );
 }

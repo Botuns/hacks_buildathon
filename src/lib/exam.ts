@@ -46,7 +46,6 @@ export interface ExamSession {
   result?: ExamResult;
 }
 
-// Type for the overall exam system
 export type OnlineExamSystem = {
   currentExam: ExamSession | null;
   startExam: (exam: Exam) => ExamSession;

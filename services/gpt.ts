@@ -71,7 +71,7 @@ export async function OpenAiGpt(prompt: string) {
   }
 }
 
-export async function OpenAiGptVoicechat(prompt: string, systemPrompt: string) {
+export async function OpenAi(prompt: string, systemPrompt: string) {
   try {
     const messages = { role: "user", content: prompt };
 
@@ -94,7 +94,7 @@ export async function OpenAiGptVoicechat(prompt: string, systemPrompt: string) {
         },
       }
     );
-    console.log(response);
+    // console.log(response);
 
     const AIRESULT = response?.data.data.choices[0].message;
     const generatedContent = AIRESULT?.content;
@@ -130,7 +130,7 @@ export async function OpenAiGptChat(prompt: string, systemPrompt: string) {
         },
       }
     );
-    console.log(response);
+    // console.log(response);
 
     const AIRESULT = response?.data.data.choices[0].message;
     const generatedContent = AIRESULT?.content;
@@ -142,4 +142,3 @@ export async function OpenAiGptChat(prompt: string, systemPrompt: string) {
     return "";
   }
 }
-

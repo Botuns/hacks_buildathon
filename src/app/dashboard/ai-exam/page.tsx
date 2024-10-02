@@ -227,7 +227,7 @@ interface GenerateButtonProps {
   loading: boolean;
 }
 
-export function GenerateButton({ onClick, loading }: GenerateButtonProps) {
+function GenerateButton({ onClick, loading }: GenerateButtonProps) {
   return (
     <Button
       onClick={onClick}
@@ -236,7 +236,7 @@ export function GenerateButton({ onClick, loading }: GenerateButtonProps) {
     >
       {loading ? (
         <div>
-          <Loader 
+          <Loader
             // size="sm"
             content="Generating..."
             speed="slow"

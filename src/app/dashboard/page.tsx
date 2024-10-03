@@ -120,7 +120,10 @@ export default function DashboardBody() {
             <CardTitle className="text-sm font-medium text-primary">
               Overall Progress
             </CardTitle>
-            <Progress value={overallProgress} className="w-[60px]" />
+            <Progress
+              value={overallProgress}
+              className="w-[60px] text-yellow-500"
+            />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{overallProgress}%</div>
@@ -201,7 +204,7 @@ export default function DashboardBody() {
                     value={
                       (course.currentProgress / course.numberOfSections) * 100
                     }
-                    className="w-full"
+                    className="w-full text-yellow-500"
                   />
                   <Button className="w-full">Continue Learning</Button>
                 </CardContent>
@@ -211,7 +214,7 @@ export default function DashboardBody() {
         )}
         {filteredCourses.length === 0 && (
           <div className="text-center text-muted-foreground">
-            No courses found. 
+            No courses found.
           </div>
         )}
       </div>

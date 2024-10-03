@@ -1,11 +1,12 @@
 import { Button } from "@/components/ui/button";
-import { Cake, Car, Building, Plane } from "lucide-react";
+import { BuildingIcon, CakeIcon, CarIcon, PlaneIcon } from "lucide-react";
+// import { Cake, Car, Building, Plane } from "lucide-react";
 
 const topics = [
-  { icon: Cake, text: "Healthiest cooking oils" },
-  { icon: Car, text: "Table of car brands by cost to maintain" },
-  { icon: Building, text: "Country with highest tax rate" },
-  { icon: Plane, text: "Most popular travel destinations 2024" },
+  { icon: CakeIcon, text: "Healthiest cooking oils" },
+  { icon: CarIcon, text: "Table of car brands by cost to maintain" },
+  { icon: BuildingIcon, text: "Country with highest tax rate" },
+  { icon: PlaneIcon, text: "Most popular travel destinations 2024" },
 ];
 
 export default function SuggestedTopics() {
@@ -17,7 +18,8 @@ export default function SuggestedTopics() {
           variant="outline"
           className="justify-start text-primary"
         >
-          <topic.icon className="mr-2 h-4 w-4" />
+          <topic.icon className="mr-2  bg-yellow-500 p-1 rounded-full text-white" />
+          {/* 🍰 */}
           {topic.text}
         </Button>
       ))}

@@ -110,3 +110,45 @@ export async function signIn(email: string, password: string) {
     };
   }
 }
+
+// function to set course progress
+export async function setCourseProgress(
+  courseId: string,
+  userId: string,
+  progress: number
+) {
+  try {
+    const isCourseExist = await db.course.findUnique({
+      where: { id: courseId },
+    });
+    if (!isCourseExist) {
+      return { success: false, error: "Course not found", data: null };
+    }
+
+    const isUserExist = await db.user.findUnique({
+      where: { id: userId },
+    });
+    if (!isUserExist) {
+      return { success: false, error: "User not found", data: null };
+    }
+
+    const updatedCourse = await db.course.update({
+      where: { id: courseId },
+      data: { currentProgress: progress },
+    });
+
+    return { success: true, error: null, data: updatedCourse };
+  } catch (error: any) {
+    logError("setCourseProgress", error);
+    return {
+      success: false,
+      error: `${"An unexpected error occurred" + error.message}`,
+      data: null,
+    };
+  }
+}
+
+
+// ark  a course as copleted. 
+
+

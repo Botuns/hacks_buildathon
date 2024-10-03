@@ -1,12 +1,11 @@
 // @ts-nocheck
 "use client";
 
-// @ts-nocheck
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
@@ -17,8 +16,10 @@ import {
   Loader2,
   Download,
   ChevronLeft,
+  FileText,
+  MessageSquare,
+  HelpCircle,
 } from "lucide-react";
-// import { Document, Page, pdfjs } from "react-pdf";
 import { toast, Toaster } from "sonner";
 import { jsPDF } from "jspdf";
 import { MDXRemote } from "next-mdx-remote";
@@ -26,16 +27,14 @@ import mdxComponents from "@/components/mdxComponents";
 import { serialize } from "next-mdx-remote/serialize";
 import html2canvas from "html2canvas";
 import ReactDOMServer from "react-dom/server";
-
-// pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
-
 import {
   chatWithPDF,
   extractTextFromPDF,
   generateQuestions,
 } from "@/lib/pdf-utils";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
-export default function ChatWithPDF() {
+export default function ImprovedChatWithPDF() {
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [pdfText, setPdfText] = useState<string>("");
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
@@ -47,10 +46,16 @@ export default function ChatWithPDF() {
   const [questionCount, setQuestionCount] = useState(5);
   const [difficulty, setDifficulty] = useState("medium");
   const [generatedQuestions, setGeneratedQuestions] = useState<string>("");
-  const [numPages, setNumPages] = useState<number | null>(null);
-  const [pageNumber, setPageNumber] = useState(1);
+  const [serilizedContents, setSerializedContents] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop =
+        chatContainerRef.current.scrollHeight;
+    }
+  }, [messages]);
 
   const handleFileUpload = async (
     event: React.ChangeEvent<HTMLInputElement>
@@ -87,10 +92,6 @@ export default function ChatWithPDF() {
         ...prev,
         { role: "assistant", content: response },
       ]);
-      if (chatContainerRef.current) {
-        chatContainerRef.current.scrollTop =
-          chatContainerRef.current.scrollHeight;
-      }
     } catch (error) {
       console.error("Error chatting with PDF:", error);
       toast.error("Failed to process your question");
@@ -109,6 +110,9 @@ export default function ChatWithPDF() {
         difficulty
       );
       setGeneratedQuestions(questions);
+      const serializedMdxContent = await serialize(generatedQuestions);
+      setSerializedContents(serializedMdxContent);
+      console.log(serializedMdxContent);
       toast.success("Questions generated successfully");
     } catch (error) {
       console.error("Error generating questions:", error);
@@ -117,19 +121,6 @@ export default function ChatWithPDF() {
       setIsLoading(false);
     }
   };
-
-  //   const handleDownloadQuestions = () => {
-  //     if (!generatedQuestions) return;
-  //     const doc = new jsPDF();
-  //     const splitText = doc.splitTextToSize(generatedQuestions, 180);
-  //     doc.text(splitText, 15, 15);
-  //     doc.save("generated_questions.pdf");
-  //   };
-
-  // const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
-  //   setNumPages(numPages);
-  //   setPageNumber(1);
-  // };
 
   const handleDownloadQuestions = async (serializedMdxContent: any) => {
     if (!serializedMdxContent) return;
@@ -150,19 +141,15 @@ export default function ChatWithPDF() {
     const pdf = new jsPDF("p", "mm", "a4");
 
     const margin = 15;
-
     const pdfWidth = pdf.internal.pageSize.getWidth();
     const pdfHeight = pdf.internal.pageSize.getHeight();
-
     const imgProps = pdf.getImageProperties(imgData);
     const imgWidth = imgProps.width;
     const imgHeight = imgProps.height;
-
     const scale = Math.min(
       (pdfWidth - 2 * margin) / imgWidth,
       (pdfHeight - 2 * margin) / imgHeight
     );
-
     const imgScaledWidth = imgWidth * scale;
     const imgScaledHeight = imgHeight * scale;
     const xOffset = (pdfWidth - imgScaledWidth) / 2;
@@ -176,27 +163,38 @@ export default function ChatWithPDF() {
       imgScaledWidth,
       imgScaledHeight
     );
-
     pdf.save("generated_questions.pdf");
   };
+
   const prepareDownload = async () => {
     const serializedMdxContent = await serialize(generatedQuestions);
-
     handleDownloadQuestions(serializedMdxContent);
   };
+
   return (
-    <div className="container mx-auto p-4 max-w-7xl">
+    <div className="container mx-auto p-4 max-w-7xl ">
       <Toaster richColors />
-      <h1 className="text-3xl font-bold mb-6 text-center">
-        👋 Hi! I&apos;m EduIfa, your AI assistant 🤖
-      </h1>
-      <div className="flex flex-col md:flex-row gap-4">
-        <Card className="w-full md:w-1/2 h-[calc(100vh-12rem)]">
-          <CardContent className="p-4 h-full">
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle className="text-3xl font-bold text-center flex items-center justify-center">
+            <HelpCircle className="w-8 h-8 mr-2 text-primary" />
+            EduIfa AI Assistant
+          </CardTitle>
+        </CardHeader>
+      </Card>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 h-full">
+        <Card className="h-[calc(100vh-16rem)]">
+          <CardHeader>
+            <CardTitle className="text-xl font-semibold flex items-center">
+              <FileText className="w-5 h-5 mr-2" />
+              PDF Viewer
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-4 h-[calc(100%-5rem)] overflow-hidden">
             {pdfFile && pdfUrl ? (
               <iframe
                 src={pdfUrl}
-                className="w-full h-full border-none"
+                className="w-full h-full border-none rounded-lg"
                 title="PDF Viewer"
               />
             ) : (
@@ -221,33 +219,50 @@ export default function ChatWithPDF() {
             )}
           </CardContent>
         </Card>
-        <Card className="w-full md:w-1/2 h-[calc(100vh-12rem)] flex flex-col">
-          <Tabs defaultValue="chat" className="flex-grow flex flex-col ">
-            <TabsList className="w-full justify-start bg-primary text-white">
-              <TabsTrigger value="chat">Chat</TabsTrigger>
-              <TabsTrigger value="generate">Generate Questions</TabsTrigger>
+        <Card className="h-[calc(100vh-16rem)] flex flex-col">
+          <Tabs defaultValue="chat" className="flex-grow flex flex-col h-full">
+            <TabsList className="w-full justify-start bg-primary text-primary-foreground">
+              <TabsTrigger
+                value="chat"
+                className="data-[state=active]:bg-primary-foreground data-[state=active]:text-primary"
+              >
+                <MessageSquare className="w-4 h-4 mr-2" />
+                Chat
+              </TabsTrigger>
+              <TabsTrigger
+                value="generate"
+                className="data-[state=active]:bg-primary-foreground data-[state=active]:text-primary"
+              >
+                <HelpCircle className="w-4 h-4 mr-2" />
+                Generate Questions
+              </TabsTrigger>
             </TabsList>
-            <TabsContent value="chat" className="flex-grow flex flex-col p-4">
+            <TabsContent
+              value="chat"
+              className="flex-grow flex flex-col p-4 overflow-hidden overflow-auto"
+            >
               <div
                 ref={chatContainerRef}
-                className="flex-grow overflow-auto mb-4 pr-2"
+                className="flex-grow overflow-auto mb-4 pr-2 space-y-4"
               >
                 {messages.map((message, index) => (
                   <div
                     key={index}
-                    className={`mb-2 ${
-                      message.role === "user" ? "text-right" : "text-left"
+                    className={`flex ${
+                      message.role === "user" ? "justify-end" : "justify-start"
                     }`}
                   >
-                    <span
-                      className={`inline-block p-2 rounded-lg ${
-                        message.role === "user"
-                          ? "bg-blue-600 text-white"
-                          : "bg-gray-200"
-                      }`}
-                    >
-                      {message.content}
-                    </span>
+                    <ScrollArea>
+                      <div
+                        className={`max-w-[80%] p-3 rounded-lg ${
+                          message.role === "user"
+                            ? "bg-primary text-primary-foreground"
+                            : "bg-secondary text-secondary-foreground"
+                        }`}
+                      >
+                        {message.content}
+                      </div>
+                    </ScrollArea>
                   </div>
                 ))}
               </div>
@@ -257,6 +272,13 @@ export default function ChatWithPDF() {
                   onChange={(e) => setInputMessage(e.target.value)}
                   placeholder="Ask a question about the PDF..."
                   className="flex-grow mr-2"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      handleSendMessage();
+                    }
+                  }}
+                  disabled={isLoading || !pdfText}
                 />
                 <Button
                   onClick={handleSendMessage}
@@ -274,16 +296,18 @@ export default function ChatWithPDF() {
               <div className="space-y-4">
                 <div>
                   <Label htmlFor="question-count">Number of Questions</Label>
-                  <Slider
-                    id="question-count"
-                    min={1}
-                    max={20}
-                    step={1}
-                    value={[questionCount]}
-                    onValueChange={(value) => setQuestionCount(value[0])}
-                    className="my-2"
-                  />
-                  <span>{questionCount}</span>
+                  <div className="flex items-center space-x-2">
+                    <Slider
+                      id="question-count"
+                      min={1}
+                      max={20}
+                      step={1}
+                      value={[questionCount]}
+                      onValueChange={(value) => setQuestionCount(value[0])}
+                      className="flex-grow"
+                    />
+                    <span className="font-semibold">{questionCount}</span>
+                  </div>
                 </div>
                 <div>
                   <Label htmlFor="difficulty">Difficulty</Label>
@@ -291,7 +315,7 @@ export default function ChatWithPDF() {
                     id="difficulty"
                     value={difficulty}
                     onChange={(e) => setDifficulty(e.target.value)}
-                    className="w-full p-2 border rounded"
+                    className="w-full p-2 border rounded-md bg-background"
                   >
                     <option value="easy">Easy</option>
                     <option value="medium">Medium</option>
@@ -303,21 +327,28 @@ export default function ChatWithPDF() {
                   className="w-full"
                   disabled={isLoading || !pdfText}
                 >
-                  {!isLoading ? (
-                    "Generate Questions"
+                  {isLoading ? (
+                    <Loader2 className="w-4 h-4 animate-spin mr-2" />
                   ) : (
-                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <HelpCircle className="w-4 h-4 mr-2" />
                   )}
+                  Generate Questions
                 </Button>
-                {generatedQuestions && (
+                {generatedQuestions && serilizedContents && (
                   <div>
                     <h3 className="text-lg font-semibold mb-2">
                       Generated Questions:
                     </h3>
-                    <div className="bg-gray-100 p-4 rounded-lg mb-4 max-h-60 overflow-auto">
-                      <pre className="whitespace-pre-wrap">
-                        {generatedQuestions}
-                      </pre>
+                    <div className="bg-secondary p-4 rounded-lg mb-4 max-h-60 overflow-auto">
+                      {/* <pre className="whitespace-pre-wrap text-secondary-foreground"> */}
+                      {/* {generatedQuestions} */}
+                      {/* <ScrollArea> */}
+                      <MDXRemote
+                        {...serilizedContents}
+                        components={mdxComponents}
+                      />
+                      {/* </ScrollArea> */}
+                      {/* </pre> */}
                     </div>
                     <Button onClick={prepareDownload} className="w-full">
                       <Download className="w-4 h-4 mr-2" />

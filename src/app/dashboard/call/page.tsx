@@ -2,56 +2,32 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { PhoneCall, PhoneOff, Mic, MicOff } from "lucide-react";
-import axios from "axios";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import {
+  PhoneCall,
+  PhoneOff,
+  Mic,
+  MicOff,
+  AlertCircle,
+  Volume2,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 import { OpenAi } from "../../../../services/gpt";
 
-// const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
-// const token = process.env.NEXT_PUBLIC_API_TOKEN;
-
-// async function OpenAiGptVoicechat(prompt: string, systemPrompt: string) {
-//   try {
-//     const messages = { role: "user", content: prompt };
-
-//     const response = await axios.post(
-//       `${BASE_URL}/knowledge-base`,
-//       {
-//         model: "gpt-4o-mini",
-//         messages: [
-//           {
-//             role: "system",
-//             content: systemPrompt,
-//           },
-//           messages,
-//         ],
-//       },
-//       {
-//         headers: {
-//           "Content-Type": "application/json",
-//           Authorization: `Bearer ${token}`,
-//         },
-//       }
-//     );
-
-//     const AIRESULT = response?.data?.data?.choices[0]?.message;
-//     const generatedContent = AIRESULT?.content;
-//     const formattedData = JSON.parse(generatedContent);
-
-//     return formattedData;
-//   } catch (error) {
-//     console.error("Error while fetching AI response:", error);
-//     return [];
-//   }
-// }
-
-export default function AIVoiceChat() {
+export default function EnhancedAIVoiceChat() {
   const [callStatus, setCallStatus] = useState<"idle" | "ringing" | "active">(
     "idle"
   );
@@ -66,6 +42,7 @@ export default function AIVoiceChat() {
   // @ts-ignore
   const recognitionRef = useRef<SpeechRecognition | null>(null);
   const synthRef = useRef<SpeechSynthesis | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -77,12 +54,14 @@ export default function AIVoiceChat() {
     }
   }, []);
 
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
   const startCall = () => {
     setCallStatus("ringing");
     if (!beepRef.current) {
       beepRef.current = new Audio("/calling.mp3");
-      //         "https://www.soundsnap.com/play?t=e&p=files/audio/47/23154-phone-tones-2.mp3"
-
       beepRef.current.loop = true;
     }
     beepRef.current.play();
@@ -122,17 +101,6 @@ export default function AIVoiceChat() {
     }
   };
 
-  // const speak = (text: string) => {
-  //   if (synthRef.current) {
-  //     setIsSpeaking(true);
-  //     setShowModal(true);
-  //     const utterance = new SpeechSynthesisUtterance(text);
-  //     utterance.onend = () => {
-  //       setIsSpeaking(false);
-  //     };
-  //     synthRef.current.speak(utterance);
-  //   }
-  // };
   const speak = (text: string) => {
     if (synthRef.current) {
       setIsSpeaking(true);
@@ -178,6 +146,7 @@ export default function AIVoiceChat() {
       synthRef.current.speak(utterance);
     }
   };
+
   const getAIResponse = async (userMessage: string) => {
     setIsLoading(true);
     try {
@@ -206,8 +175,7 @@ export default function AIVoiceChat() {
 
   useEffect(() => {
     if (recognitionRef.current) {
-      // @ts-ignore
-      recognitionRef.current.onresult = (event) => {
+      recognitionRef.current.onresult = (event: any) => {
         const transcript = event.results[0][0].transcript;
         setMessages((prev) => [...prev, { text: transcript, isUser: true }]);
         getAIResponse(transcript);
@@ -222,16 +190,30 @@ export default function AIVoiceChat() {
   }, [isListening]);
 
   return (
-    <Card className="w-full max-w-md mx-auto md:max-w-[80%]">
+    <Card className="w-full max-w-3xl mx-auto ">
+      <CardHeader>
+        <CardTitle className="text-3xl font-bold text-primary">
+          Eduifa Voice Assistant
+        </CardTitle>
+        <CardDescription>
+          Have a conversation with our AI-powered voice assistant
+        </CardDescription>
+      </CardHeader>
       <CardContent className="p-6">
+        <Alert className="mb-4">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Please note</AlertTitle>
+          <AlertDescription>
+            There may be a slight delay in audio responses as Eduifa processes
+            your request.
+          </AlertDescription>
+        </Alert>
+
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold">
-            Have a Conversation with Eduifa
-          </h2>
           {callStatus === "idle" ? (
             <Button
               onClick={startCall}
-              className="bg-green-500 hover:bg-green-600"
+              className="bg-green-500 hover:bg-green-600 text-white"
             >
               <PhoneCall className="mr-2 h-4 w-4" /> Start Call
             </Button>
@@ -243,51 +225,69 @@ export default function AIVoiceChat() {
         </div>
 
         {callStatus === "ringing" && (
-          <div className="text-center py-4">
-            <p className="text-lg">Ringing...</p>
+          <div className="text-center py-4 animate-pulse">
+            <p className="text-lg font-semibold">Calling Eduifa...</p>
+            <div className="mt-2 flex justify-center space-x-2">
+              <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce"></div>
+              <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce delay-100"></div>
+              <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce delay-200"></div>
+            </div>
           </div>
         )}
 
         {callStatus === "active" && (
           <>
-            <div className="h-64 overflow-y-auto mb-4 p-4 border rounded">
+            <div className="h-80 overflow-y-auto mb-4 p-4 border rounded-lg bg-gray-50">
               {messages.map((message, index) => (
                 <div
                   key={index}
-                  className={`mb-2 ${
-                    message.isUser ? "text-right" : "text-left"
-                  }`}
+                  className={cn(
+                    "mb-2 max-w-[80%] rounded-lg p-3",
+                    message.isUser
+                      ? "ml-auto bg-blue-100 text-blue-900"
+                      : "mr-auto bg-white text-gray-900 shadow"
+                  )}
                 >
-                  <span
-                    className={`inline-block p-2 rounded ${
-                      message.isUser ? "bg-blue-100" : "bg-gray-100"
-                    }`}
-                  >
-                    {message.text}
-                  </span>
+                  <p className="text-sm font-medium">
+                    {message.isUser ? "You" : "Eduifa"}
+                  </p>
+                  <p>{message.text}</p>
                 </div>
               ))}
               {isLoading && (
-                <div className="text-center">
-                  <p>AI is thinking...</p>
+                <div className="text-center p-2 bg-gray-100 rounded-lg animate-pulse">
+                  <p>Eduifa is thinking...</p>
                 </div>
               )}
+              <div ref={messagesEndRef} />
             </div>
-            <Button
-              onClick={toggleListening}
-              className="w-full"
-              disabled={isLoading || isSpeaking}
-            >
-              {isListening ? (
-                <>
-                  <MicOff className="mr-2 h-4 w-4" /> Stop Listening
-                </>
-              ) : (
-                <>
-                  <Mic className="mr-2 h-4 w-4" /> Start Listening
-                </>
+            <div className="flex space-x-2">
+              <Button
+                onClick={toggleListening}
+                className={cn(
+                  "flex-1",
+                  isListening
+                    ? "bg-red-500 hover:bg-red-600"
+                    : "bg-blue-500 hover:bg-blue-600"
+                )}
+                disabled={isLoading || isSpeaking}
+              >
+                {isListening ? (
+                  <>
+                    <MicOff className="mr-2 h-4 w-4" /> Stop Listening
+                  </>
+                ) : (
+                  <>
+                    <Mic className="mr-2 h-4 w-4" /> Start Listening
+                  </>
+                )}
+              </Button>
+              {isSpeaking && (
+                <Button variant="outline" className="animate-pulse">
+                  <Volume2 className="mr-2 h-4 w-4" /> Speaking...
+                </Button>
               )}
-            </Button>
+            </div>
           </>
         )}
       </CardContent>
@@ -296,7 +296,7 @@ export default function AIVoiceChat() {
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>
-              {isSpeaking ? "AI Speaking" : "Your Turn"}
+              {isSpeaking ? "Eduifa is Speaking" : "Your Turn to Speak"}
             </DialogTitle>
           </DialogHeader>
           <div className="flex flex-col items-center justify-center p-4">
@@ -312,7 +312,7 @@ export default function AIVoiceChat() {
                 className="mt-4"
                 disabled={isLoading}
               >
-                {isListening ? "Stop Responding" : "Respond"}
+                {isListening ? "Stop Responding" : "Start Speaking"}
               </Button>
             )}
           </div>

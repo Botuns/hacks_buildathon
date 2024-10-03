@@ -33,6 +33,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast, Toaster } from "sonner";
+import Link from "next/link";
 
 const formSchema = z.object({
   fullName: z.string().min(2, {
@@ -81,7 +82,7 @@ export default function SignUp() {
       const userData = await response.json();
       console.log("User registered:", userData);
       localStorage.setItem("user", JSON.stringify(userData));
-      router.push("/dashboard"); 
+      router.push("/dashboard");
     } catch (error) {
       if (error instanceof Error) {
         setError(error.message);
@@ -212,9 +213,11 @@ export default function SignUp() {
                   "Create Account"
                 )}
               </Button>
-              <p className="text-center underline text-primary cursor-pointer">
-                Already signed up?
-              </p>
+              <Link href={"/auth/sign-in"}>
+                <p className="text-center underline text-primary cursor-pointer">
+                  Already signed up?
+                </p>
+              </Link>
             </CardFooter>
           </form>
         </Form>

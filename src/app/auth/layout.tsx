@@ -31,7 +31,7 @@ export default function AuthLayout({
             <SiteHeader />
             <main className="flex flex-1">
               <div className="container flex flex-col items-center justify-center md:flex-row md:items-stretch md:justify-between">
-                <Card className="w-full max-w-full p-6 md:w-1/2">
+                <Card className="w-full max-w-full p-6 md:w-1/2  max-sm:p-0">
                   <div className="mb-4 flex justify-end">
                     <ModeToggle />
                   </div>

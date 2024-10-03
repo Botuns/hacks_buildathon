@@ -31,11 +31,11 @@ export default function SideBar() {
   const navItems = [
     { href: "/dashboard", icon: Grid, label: "Dashboard" },
     { href: "/dashboard/learn", icon: Book, label: "Study" },
-    { href: "#", icon: Search, label: "Search" },
+    { href: "/dashboard/search", icon: Search, label: "Search" },
     { href: "#", icon: Folder, label: "Projects" },
     { href: "#", icon: BookOpen, label: "Lectures Paradise" },
     { href: "#", icon: Clipboard, label: "Exams" },
-    { href: "#", icon: Rocket, label: "AI Exams" },
+    { href: "/dashboard/ai-exam", icon: Rocket, label: "AI Exams" },
     { href: "/dashboard/call", icon: Mic, label: "Voice Tutor" },
     { href: "#", icon: BookOpen, label: "Explainers" },
     { href: "/dashboard/chat-with-pdf", icon: FileText, label: "PDF/Q&A" },

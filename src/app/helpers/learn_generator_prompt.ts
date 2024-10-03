@@ -132,3 +132,40 @@ Generate the JSON object without any additional text or explanations,Generate JS
 
   return prompt;
 }
+
+export function generateSearchResultsPrompt(
+  query: string,
+  numberOfResults: number = 4
+): string {
+  const prompt = `
+Perform an extensive web search for the following query: "${query}"
+
+Generate a structured JSON object containing search results. The JSON object should follow this structure:
+{
+  "overviewDescription": string,
+  "results": [
+    {
+      "imageUrl": string,
+      "descriptionAnswer": string,
+      "confidenceLevel": number,
+      "externalLink": string
+    }
+  ]
+}
+
+Ensure that:
+1. The overviewDescription provides an extensive summary of the search topic, covering key points and general information.
+2. The number of results is exactly ${numberOfResults}.
+3. Each result contains:
+   - A relevant imageUrl (use placeholder if necessary, e.g., "https://example.com/image1.jpg")
+   - A detailed descriptionAnswer that directly addresses the query
+   - A confidenceLevel between 0 and 1, indicating the reliability of the information
+   - An externalLink to a reputable source for further reading
+4. The information is accurate and up-to-date as of your last training data.
+5. The results are diverse and cover different aspects of the query when applicable.
+
+Generate the JSON object without any additional text, explanations, or markdown formatting. Start directly with the opening curly brace '{' and end with the closing curly brace '}'. Do not include any text outside of the JSON structure.
+`;
+
+  return prompt;
+}

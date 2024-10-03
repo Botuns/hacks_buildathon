@@ -138,7 +138,7 @@ export function generateSearchResultsPrompt(
   numberOfResults: number = 4
 ): string {
   const prompt = `
-Perform an extensive web search for the following query: "${query}"
+As a professional web researcher, your role is to deepen your understanding of the user's input by conducting further inquiries especially with relevant links and images.Perform an extensive web search for the following query: "${query}"
 
 Generate a structured JSON object containing search results. The JSON object should follow this structure:
 {

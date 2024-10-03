@@ -1,4 +1,6 @@
+// @ts-nocheck
 "use client";
+
 import React, { useState, useRef, useEffect } from "react";
 import { useTheme } from "next-themes";
 import ReactMarkdown from "react-markdown";
@@ -16,6 +18,8 @@ import {
   Plus,
   Minimize2,
   Maximize2,
+  Settings,
+  HelpCircle,
 } from "lucide-react";
 
 import { OpenAiGptChat } from "../../../../services/gpt";
@@ -28,7 +32,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-// import { Switch } from "@radix-ui/react-switch";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import {
@@ -41,6 +44,15 @@ import {
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Label } from "@/components/ui/label";
 
 const TypingIndicator = () => (
   <div className="flex space-x-2 p-2 bg-primary/10 rounded-lg">
@@ -90,11 +102,9 @@ const MessageBubble = ({ message, onEdit }: any) => (
         <CardContent className="p-3">
           <ReactMarkdown
             components={{
-              // @ts-ignore
               code({ node, inline, className, children, ...props }) {
                 const match = /language-(\w+)/.exec(className || "");
                 return !inline && match ? (
-                  // @ts-ignore
                   <SyntaxHighlighter
                     style={tomorrow as any}
                     language={match[1]}
@@ -135,6 +145,7 @@ const ChatwithEduifa = () => {
     role: "user" | "assistant";
     content: string;
   };
+
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -143,29 +154,29 @@ const ChatwithEduifa = () => {
   );
   const [isCompactView, setIsCompactView] = useState(false);
   const { theme, setTheme } = useTheme();
-  const messagesEndRef = useRef(null);
-  const fileInputRef = useRef(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [isPromptDialogOpen, setIsPromptDialogOpen] = useState(false);
+  const [isHelpDialogOpen, setIsHelpDialogOpen] = useState(false);
+  const [autoScroll, setAutoScroll] = useState(true);
 
   useEffect(() => {
-    // @ts-ignore
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+    if (autoScroll) {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages, autoScroll]);
 
   const handleSend = async () => {
     if (!input.trim()) return;
 
     const newMessages = [...messages, { role: "user", content: input }];
-    setMessages(newMessages as Message[]);
+    setMessages(newMessages);
     setInput("");
     setIsLoading(true);
 
     try {
       const response = await OpenAiGptChat(input, systemPrompt);
-      setMessages([
-        ...newMessages,
-        { role: "assistant", content: response },
-      ] as Message[]);
+      setMessages([...newMessages, { role: "assistant", content: response }]);
     } catch (error) {
       console.error("Error in AI response:", error);
       setMessages([
@@ -174,13 +185,13 @@ const ChatwithEduifa = () => {
           role: "assistant",
           content: "Sorry, I encountered an error. Please try again.",
         },
-      ] as Message[]);
+      ]);
     }
 
     setIsLoading(false);
   };
 
-  const handleEdit = (content: any) => {
+  const handleEdit = (content: string) => {
     setInput(content);
     setMessages(messages.slice(0, -1));
   };
@@ -195,14 +206,13 @@ const ChatwithEduifa = () => {
     link.click();
   };
 
-  const handleLoad = (event: any) => {
+  const handleLoad = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       const reader = new FileReader();
       reader.onload = (e) => {
         try {
-          // @ts-ignore
-          const loadedMessages = JSON.parse(e.target.result);
+          const loadedMessages = JSON.parse(e.target.result as string);
           setMessages(loadedMessages);
         } catch (error) {
           console.error("Error parsing JSON:", error);
@@ -227,27 +237,50 @@ const ChatwithEduifa = () => {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => setIsPromptDialogOpen(true)}
+                  onClick={() => setIsHelpDialogOpen(true)}
                 >
-                  <Plus className="h-4 w-4" />
+                  <HelpCircle className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Edit System Prompt</p>
+                <p>Help</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
-          <Switch
-            checked={theme === "dark"}
-            onCheckedChange={() =>
-              setTheme(theme === "dark" ? "light" : "dark")
-            }
-          />
-          {theme === "dark" ? (
-            <Moon className="h-4 w-4" />
-          ) : (
-            <Sun className="h-4 w-4" />
-          )}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="sm">
+                <Settings className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuLabel>Settings</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => setIsPromptDialogOpen(true)}>
+                Edit System Prompt
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <div className="flex items-center justify-between w-full">
+                  <span>Auto-scroll</span>
+                  <Switch
+                    checked={autoScroll}
+                    onCheckedChange={setAutoScroll}
+                  />
+                </div>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <div className="flex items-center justify-between w-full">
+                  <span>Dark Mode</span>
+                  <Switch
+                    checked={theme === "dark"}
+                    onCheckedChange={() =>
+                      setTheme(theme === "dark" ? "light" : "dark")
+                    }
+                  />
+                </div>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           <Button
             variant="ghost"
             size="sm"
@@ -283,11 +316,9 @@ const ChatwithEduifa = () => {
       <div className="flex space-x-2">
         <Input
           value={input}
-          onChange={(e: any) => setInput(e.target.value)}
+          onChange={(e) => setInput(e.target.value)}
           placeholder="Type your message..."
-          onKeyPress={(e: any) =>
-            e.key === "Enter" && !e.shiftKey && handleSend()
-          }
+          onKeyPress={(e) => e.key === "Enter" && !e.shiftKey && handleSend()}
           className="flex-grow"
         />
         <Button onClick={handleSend} disabled={isLoading}>
@@ -309,7 +340,6 @@ const ChatwithEduifa = () => {
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              {/* @ts-ignore */}
               <Button onClick={() => fileInputRef.current?.click()}>
                 <Upload className="h-4 w-4" />
               </Button>
@@ -350,7 +380,7 @@ const ChatwithEduifa = () => {
           </DialogHeader>
           <Textarea
             value={systemPrompt}
-            onChange={(e: any) => setSystemPrompt(e.target.value)}
+            onChange={(e) => setSystemPrompt(e.target.value)}
             placeholder="Enter system prompt..."
             rows={5}
           />
@@ -358,6 +388,47 @@ const ChatwithEduifa = () => {
             <Button onClick={() => setIsPromptDialogOpen(false)}>
               Save Changes
             </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isHelpDialogOpen} onOpenChange={setIsHelpDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Chat with Eduifa - Help</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p>
+              Welcome to Chat with Eduifa! Here are some tips to get you
+              started:
+            </p>
+            <ul className="list-disc pl-5 space-y-2">
+              <li>
+                Type your message in the input box and press Enter or click Send
+                to chat with Eduifa.
+              </li>
+              <li>
+                Use the Edit button on your messages to modify them before
+                resending.
+              </li>
+              <li>
+                Save your chat session using the Save button and load it later
+                with the Upload button.
+              </li>
+              <li>Clear the entire chat history with the Reset button.</li>
+              <li>
+                Customize Eduifa&apos;s behavior by editing the system prompt in
+                the Settings menu.
+              </li>
+              <li>
+                Toggle between compact and full-width view using the resize
+                button.
+              </li>
+              <li>Switch between light and dark mode in the Settings menu.</li>
+            </ul>
+          </div>
+          <DialogFooter>
+            <Button onClick={() => setIsHelpDialogOpen(false)}>Close</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

@@ -157,7 +157,7 @@ Ensure that:
 1. The overviewDescription provides an extensive summary of the search topic, covering key points and general information.
 2. The number of results is exactly ${numberOfResults}.
 3. Each result contains:
-   - A relevant imageUrl (use placeholder if necessary, e.g., "https://example.com/image1.jpg")
+   - A relevant imageUrl (use placeholder if which is copulsory, e.g., "https://example.com/image1.jpg but it ust be antual  image url")
    - A detailed descriptionAnswer that directly addresses the query
    - A confidenceLevel between 0 and 1, indicating the reliability of the information
    - An externalLink to a reputable source for further reading

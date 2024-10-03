@@ -78,7 +78,7 @@ export default function AISearchPage() {
               <SearchResults results={searchResults} />
             ) : (
               <Card>
-                <CardContent>
+                <CardContent className="text-center items-center p-2">
                   <SuggestedTopics />
                 </CardContent>
               </Card>

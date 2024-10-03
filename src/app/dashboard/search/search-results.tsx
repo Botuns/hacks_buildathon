@@ -28,7 +28,6 @@ export default function SearchResults({ results }: SearchResultsProps) {
             <div className="flex-shrink-0">
               <Image
                 src={
-                  result.imageUrl ||
                   "https://img.freepik.com/free-vector/search-concept-landing-page_23-2148211329.jpg"
                 }
                 alt="Result image"

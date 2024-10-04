@@ -40,7 +40,11 @@ export default function SideBar() {
     { href: "#", icon: BookOpen, label: "Explainers" },
     { href: "/dashboard/chat-with-pdf", icon: FileText, label: "PDF/Q&A" },
     { href: "#", icon: Cloud, label: "Photos" },
-    { href: "#", icon: CloudLightning, label: "Groups" },
+    {
+      href: "/dashboard/document/7712f688-0b76-4ca3-8e88-b1a111fb7bc3",
+      icon: CloudLightning,
+      label: "Group Collaboration",
+    },
     { href: "#", icon: Bell, label: "Notifications" },
     { href: "#", icon: Lightbulb, label: "Profile" },
     { href: "#", icon: HelpCircle, label: "Help" },

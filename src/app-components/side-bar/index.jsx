@@ -44,7 +44,7 @@ export default function SideBar() {
     { href: "#", icon: Bell, label: "Notifications" },
     { href: "#", icon: Lightbulb, label: "Profile" },
     { href: "#", icon: HelpCircle, label: "Help" },
-    { href: "#", icon: Lightbulb, label: "Tips" },
+    { href: "/dashboard/game", icon: Lightbulb, label: "Games" },
     { href: "#", icon: LogOut, label: "Logout" },
   ];
 

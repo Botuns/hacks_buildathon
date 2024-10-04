@@ -151,7 +151,7 @@ function GameBoard() {
       userAnswer.toLowerCase().trim() === currentChallenge.answer.toLowerCase()
     ) {
       setFeedback("Correct! Moving up the board.");
-      movePlayer(Math.floor(Math.random() * 3) + 1); // Move 1-3 spaces
+      movePlayer(Math.floor(Math.random() * 3) + 1);
       confetti({
         particleCount: 100,
         spread: 70,

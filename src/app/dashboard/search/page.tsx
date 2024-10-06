@@ -5,18 +5,19 @@ import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent } from "@/components/ui/card";
-import { Loader2, Search, ArrowUp } from "lucide-react";
+import { Loader2, Search, ArrowUp, Plus } from "lucide-react";
 import SearchResults from "./search-results";
 import SuggestedTopics from "./suggested-topics";
-import { generateSearchResults } from "@/app/helpers";
-import { OpenAiSearchResults } from "@/lib/search";
+import { AiSearchResults, tvly } from "@/lib/search";
 import GradientTitle from "./gradient-title";
+import Textarea from "react-textarea-autosize";
 
 export default function AISearchPage() {
   const [query, setQuery] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [searchResults, setSearchResults] =
-    useState<OpenAiSearchResults | null>(null);
+  const [searchResults, setSearchResults] = useState<AiSearchResults | null>(
+    null
+  );
   const { toast } = useToast();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -27,8 +28,8 @@ export default function AISearchPage() {
     }
   }, [query]);
 
-  const handleSearch = async () => {
-    if (!query.trim()) {
+  const handleSearch = async (searchQuery: string) => {
+    if (!searchQuery.trim()) {
       toast({
         title: "Error",
         description: "Please enter a search query.",
@@ -39,7 +40,18 @@ export default function AISearchPage() {
 
     setIsLoading(true);
     try {
-      const results = await generateSearchResults(query);
+      const response = await tvly.search(searchQuery, {
+        includeAnswer: true,
+        includeImages: true,
+        maxResults: 5,
+      });
+
+      const results: AiSearchResults = {
+        overviewDescription: response.answer || "No overview available.",
+        results: response.results,
+        images: response.images,
+      };
+
       setSearchResults(results);
     } catch (error) {
       toast({
@@ -55,8 +67,13 @@ export default function AISearchPage() {
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      handleSearch();
+      handleSearch(query);
     }
+  };
+
+  const handleClear = () => {
+    setSearchResults(null);
+    setQuery("");
   };
 
   return (
@@ -67,7 +84,7 @@ export default function AISearchPage() {
           <div className="relative">
             <div className="flex items-center border rounded-lg bg-background focus-within:ring-2 focus-within:ring-ring focus-within:border-input">
               <Search className="absolute left-3 top-3 text-muted-foreground" />
-              <textarea
+              <Textarea
                 ref={textareaRef}
                 placeholder="Search anything..."
                 value={query}
@@ -77,7 +94,7 @@ export default function AISearchPage() {
                 rows={1}
               />
               <Button
-                onClick={handleSearch}
+                onClick={() => handleSearch(query)}
                 disabled={isLoading}
                 className="absolute right-2 top-1/2 transform -translate-y-1/2 rounded-full"
               >
@@ -95,13 +112,29 @@ export default function AISearchPage() {
             ) : (
               <Card>
                 <CardContent className="text-center items-center p-2">
-                  <SuggestedTopics />
+                  <SuggestedTopics onTopicClick={handleSearch} />
                 </CardContent>
               </Card>
             )}
           </ScrollArea>
         </div>
       </main>
+      {searchResults && (
+        <div className="fixed bottom-2 md:bottom-8 left-0 right-0 flex justify-center items-center mx-auto pointer-events-none">
+          <Button
+            type="button"
+            variant="secondary"
+            className="rounded-full bg-secondary/80 group transition-all hover:scale-105 pointer-events-auto"
+            onClick={handleClear}
+            disabled={isLoading}
+          >
+            <span className="text-sm mr-2 group-hover:block hidden animate-in fade-in duration-300">
+              New
+            </span>
+            <Plus size={18} className="group-hover:rotate-90 transition-all" />
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

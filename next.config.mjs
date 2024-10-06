@@ -45,6 +45,10 @@ const withMDX = createMDX({
         protocol: "https",
         hostname: "**",
       },
+      {
+        protocol: "http",
+        hostname: "**",
+      },
     ],
   },
   options: {

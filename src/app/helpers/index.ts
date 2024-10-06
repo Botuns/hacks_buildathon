@@ -4,7 +4,7 @@ import {
   generateExamPrompt,
   generateSearchResultsPrompt,
 } from "./learn_generator_prompt";
-import { OpenAiSearchResults } from "@/lib/search";
+import { AiSearchResults } from "@/lib/search";
 
 export async function generateExam(
   difficulty: DifficultyLevel,
@@ -35,14 +35,14 @@ export async function generateExam(
 export async function generateSearchResults(
   query: string,
   numberOfResults: number = 4
-): Promise<OpenAiSearchResults> {
+): Promise<AiSearchResults> {
   const prompt = generateSearchResultsPrompt(query, numberOfResults);
   const systemPrompt =
     "You are an AI assistant specialized in performing web searches and providing structured search results.";
 
   try {
     const generatedContent = await OpenAi(prompt, systemPrompt);
-    const searchResults: OpenAiSearchResults = JSON.parse(generatedContent);
+    const searchResults: AiSearchResults = JSON.parse(generatedContent);
 
     if (
       !searchResults.overviewDescription ||

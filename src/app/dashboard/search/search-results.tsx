@@ -1,87 +1,99 @@
-import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ExternalLink } from "lucide-react";
-import { OpenAiSearchResults } from "@/lib/search";
-import { useEffect, useState } from "react";
-import { fallbackImageUrl, isValidImageUrl } from ".";
+import { ExternalLink, Globe } from "lucide-react";
+import { AiSearchResults } from "@/lib/search";
+import Image from "next/image";
+import Link from "next/link";
 
 interface SearchResultsProps {
-  results: OpenAiSearchResults;
+  results: AiSearchResults;
 }
 
 export default function SearchResults({ results }: SearchResultsProps) {
-  const [validatedResults, setValidatedResults] = useState(results);
-  useEffect(() => {
-    const validateImages = async () => {
-      const updatedResults = await Promise.all(
-        results.results.map(async (result) => {
-          const isValid = await isValidImageUrl(result.imageUrl);
-          return {
-            ...result,
-            imageUrl: isValid ? result.imageUrl : fallbackImageUrl,
-          };
-        })
-      );
-
-      setValidatedResults({
-        ...results,
-        results: updatedResults,
-      });
-    };
-
-    validateImages();
-  }, [results]);
-
   return (
-    <div className="space-y-4">
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">
-            Returned the following results based on your search query:
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p>{validatedResults.overviewDescription}</p>
-        </CardContent>
-      </Card>
-      {validatedResults.results.map((result, index) => (
-        <Card key={index}>
-          <CardContent className="flex items-start space-x-4 p-4 max-sm:flex-col">
-            <div className="flex-shrink-0">
-              <Image
-                src={result.imageUrl}
-                alt="Result image"
-                width={100}
-                height={100}
-                className="rounded-lg"
-              />
-            </div>
-            <div className="flex-grow">
-              <p className="text-sm text-muted-foreground mb-2">
-                {result.descriptionAnswer}
-              </p>
-              <div className="flex items-center justify-between">
-                <Badge variant="secondary" className="bg-green-200">
-                  Confidence: {result.confidenceLevel * 100}%
-                </Badge>
-                <Button variant="outline" size="sm" asChild>
-                  <a
-                    href={result.externalLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-primary"
-                  >
-                    <ExternalLink className="h-4 w-4 mr-2 text-primary" />
-                    Learn More
-                  </a>
-                </Button>
-              </div>
+    <div className="space-y-6">
+      {results.overviewDescription && (
+        <Card className="bg-primary ">
+          <CardHeader>
+            <CardTitle className="text-lg font-medium text-blue-50">
+              Answer
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="prose prose-invert max-w-none">
+              <p className="text-blue-100">{results.overviewDescription}</p>
             </div>
           </CardContent>
         </Card>
-      ))}
+      )}
+
+      {results.images.length > 0 && (
+        <Card className="bg-primary ">
+          <CardHeader>
+            <CardTitle className="text-lg font-medium text-blue-50">
+              Images
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 gap-4">
+              {results.images.slice(0, 4).map((image, index) => (
+                <div key={index} className="relative aspect-video">
+                  <Image
+                    src={image.url}
+                    alt={image.description || "Search result image"}
+                    layout="fill"
+                    objectFit="cover"
+                    className="rounded-lg"
+                  />
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      <Card className="bg-primary ">
+        <CardHeader>
+          <CardTitle className="text-lg font-medium text-blue-50">
+            Sources
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {results.results.map((result, index) => (
+              <div key={index} className="flex items-start space-x-4">
+                <div className="flex-shrink-0 w-6 h-6 rounded-full bg-primary flex items-center justify-center">
+                  <Globe className="w-4 h-4 text-blue-50" />
+                </div>
+                <div className="flex-grow">
+                  <h3 className="text-sm font-medium text-blue-50">
+                    {result.title}
+                  </h3>
+                  <Link href={result.url} className="text-sm text-blue-100">
+                    <ExternalLink className="w-4 h-4 inline-block" />
+                    <p className="text-xs text-blue-200 hover:undeline">
+                      {result.url}
+                    </p>
+                  </Link>
+                  <p className="text-sm text-blue-100 mt-1">{result.content}</p>
+                </div>
+                <Badge variant="secondary" className="bg-primary text-blue-100">
+                  {Math.round(result.score * 100)}
+                </Badge>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {results.results.length > 5 && (
+        <div className="flex justify-center">
+          <Button variant="outline" size="sm" className="">
+            View {results.results.length - 5} more
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

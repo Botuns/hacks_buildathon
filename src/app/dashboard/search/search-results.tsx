@@ -14,29 +14,27 @@ export default function SearchResults({ results }: SearchResultsProps) {
   return (
     <div className="space-y-6">
       {results.overviewDescription && (
-        <Card className="bg-primary ">
+        <Card className=" ">
           <CardHeader>
-            <CardTitle className="text-lg font-medium text-blue-50">
-              Answer
-            </CardTitle>
+            <CardTitle className="text-lg font-medium ">Answer</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="prose prose-invert max-w-none">
-              <p className="text-blue-100">{results.overviewDescription}</p>
+              <p className="  text-gray-700">{results.overviewDescription}</p>
             </div>
           </CardContent>
         </Card>
       )}
 
       {results.images.length > 0 && (
-        <Card className="bg-primary ">
+        <Card className="bg-secondary ">
           <CardHeader>
             <CardTitle className="text-lg font-medium text-blue-50">
               Images
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-4 auto-cols-auto	 ">
               {results.images.slice(0, 4).map((image, index) => (
                 <div key={index} className="relative aspect-video">
                   <Image
@@ -53,32 +51,33 @@ export default function SearchResults({ results }: SearchResultsProps) {
         </Card>
       )}
 
-      <Card className="bg-primary ">
+      <Card className="">
         <CardHeader>
-          <CardTitle className="text-lg font-medium text-blue-50">
-            Sources
-          </CardTitle>
+          <CardTitle className="text-lg font-medium ">Sources</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             {results.results.map((result, index) => (
-              <div key={index} className="flex items-start space-x-4">
-                <div className="flex-shrink-0 w-6 h-6 rounded-full bg-primary flex items-center justify-center">
-                  <Globe className="w-4 h-4 text-blue-50" />
+              <div
+                key={index}
+                className="flex items-start space-x-4  shadow  p-2 rounded-lg"
+              >
+                <div className="flex-shrink-0 w-6 h-6 rounded-full  flex items-center justify-center">
+                  <Globe className="w-4 h-4 text-gray-700" />
                 </div>
                 <div className="flex-grow">
-                  <h3 className="text-sm font-medium text-blue-50">
+                  <h3 className="text-sm font-medium text-gray-600">
                     {result.title}
                   </h3>
-                  <Link href={result.url} className="text-sm text-blue-100">
+                  <Link href={result.url} className="text-sm text-gray-400">
                     <ExternalLink className="w-4 h-4 inline-block" />
-                    <p className="text-xs text-blue-200 hover:undeline">
+                    <p className="text-xs text-gray-400 hover:undeline">
                       {result.url}
                     </p>
                   </Link>
-                  <p className="text-sm text-blue-100 mt-1">{result.content}</p>
+                  <p className="text-sm text-gray-600 mt-1">{result.content}</p>
                 </div>
-                <Badge variant="secondary" className="bg-primary text-blue-100">
+                <Badge variant="secondary" className="bg-primary text-white">
                   {Math.round(result.score * 100)}
                 </Badge>
               </div>

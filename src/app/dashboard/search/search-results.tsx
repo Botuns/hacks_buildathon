@@ -27,7 +27,7 @@ export default function SearchResults({ results }: SearchResultsProps) {
       )}
 
       {results.images.length > 0 && (
-        <Card className="bg-secondary ">
+        <Card className="bg-secondary">
           <CardHeader>
             <CardTitle className="text-lg font-medium text-blue-50">
               Images
@@ -36,13 +36,13 @@ export default function SearchResults({ results }: SearchResultsProps) {
           <CardContent>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {results.images.slice(0, 4).map((image, index) => (
-                <div key={index} className="relative aspect-video">
+                <div key={index} className="relative w-full pt-[56.25%]">
                   <Image
                     src={image.url}
                     alt={image.description || "Search result image"}
                     layout="fill"
                     objectFit="cover"
-                    className="rounded-lg"
+                    className="rounded-lg absolute inset-0"
                   />
                 </div>
               ))}

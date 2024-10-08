@@ -34,7 +34,7 @@ export default function SearchResults({ results }: SearchResultsProps) {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 gap-4 auto-cols-auto	 ">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {results.images.slice(0, 4).map((image, index) => (
                 <div key={index} className="relative aspect-video">
                   <Image

@@ -23,20 +23,40 @@ import {
   Settings,
   HelpCircle,
   Search,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { getUserCourses } from "../helpers/queries";
 import { Course } from "@prisma/client";
 import { getUserFromLocalStorage } from "../helpers/user";
+import { StatsCard } from "@/components/stats-card";
+import { ActionButtonGrid } from "@/components/actions";
+import CourseCard from "@/components/course-card";
 
 export default function DashboardBody() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const router = useRouter();
+  const [currentPage, setCurrentPage] = useState(1);
+  const coursesPerPage = 3;
+  const totalPages = Math.ceil(courses.length / coursesPerPage);
 
-  function Navigate(url: string) {
-    router.push(url);
-  }
+  const indexOfLastCourse = currentPage * coursesPerPage;
+  const indexOfFirstCourse = indexOfLastCourse - coursesPerPage;
+  const currentCourses = courses.slice(indexOfFirstCourse, indexOfLastCourse);
+
+  const nextPage = () => {
+    setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+  };
+
+  const prevPage = () => {
+    setCurrentPage((prev) => Math.max(prev - 1, 1));
+  };
+
+  // function Navigate(url: string) {
+  //   router.push(url);
+  // }
 
   useEffect(() => {
     async function fetchCourses() {
@@ -66,9 +86,12 @@ export default function DashboardBody() {
     course.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const navigateToCourse = (courseId: string) => {
-    router.push(`/dashboard/learn/${courseId}`);
-  };
+  // const navigateToCourse = (courseId: string) => {
+  //   router.push(`/dashboard/learn/${courseId}`);
+  // };
+  const completedCourses = courses.filter(
+    (course) => course.currentProgress === course.numberOfSections
+  ).length;
 
   const overallProgress =
     courses.length > 0
@@ -84,80 +107,32 @@ export default function DashboardBody() {
       : 0;
 
   return (
-    <div className="container mx-auto p-8 space-y-8">
-      <h1 className="text-4xl font-bold">Your Learning Dashboard</h1>
+    <div className="container mx-auto p-8  space-y-8 py-0">
+      <h1 className="text-2xl font-bold">Your Learning Dashboard</h1>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-primary">
-              Total Courses
-            </CardTitle>
-            <Book className="h-4 w-4 text-muted-foreground text-primary" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{courses.length}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-primary">
-              Completed Courses
-            </CardTitle>
-            <Trophy className="h-4 w-4 text-muted-foreground text-primary" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {
-                courses.filter(
-                  (course) => course.currentProgress === course.numberOfSections
-                ).length
-              }
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-primary">
-              Overall Progress
-            </CardTitle>
-            <Progress
-              value={overallProgress}
-              className="w-[60px] text-yellow-500"
-            />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{overallProgress}%</div>
-          </CardContent>
-        </Card>
+        <StatsCard
+          title="Total Courses"
+          value={courses.length}
+          icon="book"
+          variant="green"
+        />
+        <StatsCard
+          title="Completed Courses"
+          value={completedCourses}
+          icon="trophy"
+          variant="blue"
+        />
+        <StatsCard
+          title="Overall Progress"
+          value={overallProgress}
+          showAsProgress={true}
+          icon="none"
+          variant="purple"
+        />
       </div>
       <div className="space-y-4">
         <h2 className="text-2xl font-semibold">AI-Powered Features</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-          <Button
-            variant="outline"
-            className="h-24 flex flex-col items-center justify-center space-y-2"
-            onClick={() => Navigate("/dashboard/call")}
-          >
-            <Mic className="h-6 w-6 text-primary" />
-            <span>Voice Call with AI</span>
-          </Button>
-          <Button
-            variant="outline"
-            className="h-24 flex flex-col items-center justify-center space-y-2"
-            onClick={() => Navigate("/dashboard/chat")}
-          >
-            <MessageSquare className="h-6 w-6 text-primary" />
-            <span>Chat with AI</span>
-          </Button>
-          <Button
-            variant="outline"
-            className="h-24 flex flex-col items-center justify-center space-y-2"
-            onClick={() => Navigate("/dashboard/chat-with-pdf")}
-          >
-            <FileText className="h-6 w-6 text-primary" />
-            <span>Chat with PDF</span>
-          </Button>
-        </div>
+        <ActionButtonGrid />
       </div>
       <div className="space-y-4">
         <h2 className="text-2xl font-semibold">Your Recent Courses</h2>
@@ -176,40 +151,33 @@ export default function DashboardBody() {
             <Loader2 className="h-8 w-8 animate-spin" />
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredCourses.map((course) => (
-              <Card
-                key={course.id}
-                className="overflow-hidden hover:shadow-lg transition-shadow duration-300"
-                onClick={() => navigateToCourse(course.id)}
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {currentCourses.map((course) => (
+                <CourseCard key={course.id} course={course} />
+              ))}
+            </div>
+            <div className="flex justify-between items-center">
+              <Button
+                variant="outline"
+                onClick={prevPage}
+                disabled={currentPage === 1}
               >
-                <Image
-                  src={
-                    "https://img.freepik.com/free-vector/abstract-organic-pattern-design-background_1048-19286.jpg"
-                  }
-                  alt={course.title}
-                  width={400}
-                  height={200}
-                  className="w-full h-48 object-cover"
-                />
-                <CardHeader>
-                  <CardTitle className="line-clamp-1">{course.title}</CardTitle>
-                  <CardDescription>
-                    Progress: {course.currentProgress} /{" "}
-                    {course.numberOfSections} sections
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  <Progress
-                    value={
-                      (course.currentProgress / course.numberOfSections) * 100
-                    }
-                    className="w-full text-yellow-500"
-                  />
-                  <Button className="w-full">Continue Learning</Button>
-                </CardContent>
-              </Card>
-            ))}
+                <ChevronLeft className="h-4 w-4 mr-2" />
+                Previous
+              </Button>
+              <span>
+                Page {currentPage} of {totalPages}
+              </span>
+              <Button
+                variant="outline"
+                onClick={nextPage}
+                disabled={currentPage === totalPages}
+              >
+                Next
+                <ChevronRight className="h-4 w-4 ml-2" />
+              </Button>
+            </div>
           </div>
         )}
         {filteredCourses.length === 0 && (

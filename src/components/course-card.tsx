@@ -71,11 +71,15 @@ export default function CourseCard({ course }: Props) {
             <Button
               variant="outline"
               size={"sm"}
-              className="flex-1 bg-background hover:bg-background rounded-full"
+              className="flex-1 bg-background hover:bg-background rounded-full text-red"
             >
-              Skip
+              Delete
             </Button>
-            <Button className="flex-1 rounded-full" size={"sm"}>
+            <Button
+              className="flex-1 rounded-full"
+              size={"sm"}
+              onClick={() => navigateToCourse(course.id)}
+            >
               Continue
             </Button>
           </div>

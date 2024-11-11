@@ -42,6 +42,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getUserFromLocalStorage, User } from "@/app/helpers/user";
 import { Course } from "@prisma/client";
+import { GenerateCourseOutput } from "../../../../services/ai-sdk";
 
 const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -84,7 +85,10 @@ export default function LearningRequest() {
           const images = extractImageInfo(img_res.data.response.images);
           // console.log(images);
           const prompt = refined_learn_generator_prompt(values, videos, images);
-          const open_ai_response: CourseContent = await OpenAiGpt(prompt);
+          // const open_ai_response: CourseContent = await OpenAiGpt(prompt);
+          const open_ai_response: CourseContent = await GenerateCourseOutput(
+            prompt
+          );
           console.log(open_ai_response);
           // check if open ai response is of type CourseContent
           if (

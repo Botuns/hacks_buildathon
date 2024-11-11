@@ -27,6 +27,7 @@ export function refined_learn_generator_prompt(
        - A header that clearly indicates the topic of the section.
        - Explanatory text that is detailed but suited to the understanding level and difficulty level provided.
        - An embedded video (use the provided YouTube URLs) or an image (use the provided image URLs) relevant to the section’s content. 
+       -Content also (including relevant tables if needed,charts and other graphic element designed in mdx), Interactive Elements (quizzes, exercises, etc.)
     
     3. **Conclusion**: Summarize the key points covered in the module. 
     

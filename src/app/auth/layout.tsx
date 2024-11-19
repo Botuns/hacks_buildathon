@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ModeToggle } from "@/components/mode-toggle";
 import { cn } from "@/lib/utils";
+import SiteHeader from "@/app-components/site-header";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -26,12 +27,16 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <div className="flex min-h-screen flex-col">
-            <header className="border-b">
+            {/* <header className="border-b">
               <div className="container flex h-16 items-center justify-between">
                 <div className="text-2xl font-bold">Eduifa</div>
                 <ModeToggle />
               </div>
-            </header>
+            </header> */}
+            <div className="h-16">
+              {" "}
+              <SiteHeader />
+            </div>
             <main className="flex-1">
               <div className="container flex items-center justify-center py-12">
                 {children}

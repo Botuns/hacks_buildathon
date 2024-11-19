@@ -1,10 +1,8 @@
 import { Inter } from "next/font/google";
-import Image from "next/image";
 import type { Metadata } from "next";
-import { Card } from "@/components/ui/card";
-import SiteHeader from "@/app-components/site-header";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ModeToggle } from "@/components/mode-toggle";
+import { cn } from "@/lib/utils";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -13,14 +11,14 @@ export const metadata: Metadata = {
   description: "Enter your details to get started",
 };
 
-export default function AuthLayout({
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={cn(inter.className, "bg-background")}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
@@ -28,26 +26,15 @@ export default function AuthLayout({
           disableTransitionOnChange
         >
           <div className="flex min-h-screen flex-col">
-            <SiteHeader />
-            <main className="flex flex-1">
-              <div className="container flex flex-col items-center justify-center md:flex-row md:items-stretch md:justify-between">
-                <Card className="w-full max-w-full p-6 md:w-1/2  max-sm:p-0">
-                  <div className="mb-4 flex justify-end">
-                    <ModeToggle />
-                  </div>
-                  {children}
-                </Card>
-                <div className="relative hidden h-full w-1/2 md:block">
-                  <Image
-                    src="/girl-studying-university-library.jpg"
-                    alt="Girl studying in university library"
-                    fill
-                    className="object-cover"
-                    sizes="50vw"
-                    priority
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-background/20" />
-                </div>
+            <header className="border-b">
+              <div className="container flex h-16 items-center justify-between">
+                <div className="text-2xl font-bold">Eduifa</div>
+                <ModeToggle />
+              </div>
+            </header>
+            <main className="flex-1">
+              <div className="container flex items-center justify-center py-12">
+                {children}
               </div>
             </main>
           </div>

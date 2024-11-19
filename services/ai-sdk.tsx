@@ -1,4 +1,4 @@
-// "use server";
+"use server";
 import { generateObject } from "ai";
 import dotenv from "dotenv";
 import { createOpenAI } from "@ai-sdk/openai";

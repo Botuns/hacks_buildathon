@@ -1,27 +1,29 @@
+"use server";
 import { generateObject } from "ai";
 import dotenv from "dotenv";
 import { createOpenAI } from "@ai-sdk/openai";
 // import { openai } from "@ai-sdk/openai";
 import { z } from "zod";
 import "dotenv/config";
+import { DifficultyLevel, Exam } from "@/lib/exam";
+import { generateExamPrompt } from "@/app/helpers/learn_generator_prompt";
+import { ExamSchema } from "./exam-schema";
 dotenv.config();
 const api_key = process.env.OPENAI_API_KEY;
 
 const openai = createOpenAI({
-  apiKey:
-    "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",
-  // custom settings, e.g.
-  compatibility: "strict", // strict mode, enable when using the OpenAI API
+  apiKey: api_key,
+  compatibility: "strict",
 });
 
 export async function GenerateCourseOutput(prompt: string) {
-  console.log(api_key);
+  // console.log(api_key);
   const response = await generateObject({
     model: openai("gpt-4o-mini"),
     schema: courseSchema,
     prompt: prompt,
   });
-  console.log(response);
+  // console.log(response);
   return response.object as CourseContent;
 }
 
@@ -39,3 +41,32 @@ const courseSchema = z.object({
   ),
   numberOfSections: z.number().describe("The number of sections in the course"),
 });
+
+export async function generateExamQuestions(
+  difficulty: DifficultyLevel,
+  className: string,
+  description: string,
+  numberOfQuestions: number
+) {
+  const systemPrompt =
+    "You are an AI assistant specialized in creating structured exam content.";
+  try {
+    const _prompt = generateExamPrompt(
+      difficulty,
+      className,
+      description,
+      numberOfQuestions
+    );
+    const response = await generateObject({
+      model: openai("gpt-4o-mini"),
+      schema: ExamSchema,
+      prompt: _prompt,
+      system: systemPrompt,
+    });
+    console.log(response);
+    return response.object as Exam;
+  } catch (error: any) {
+    console.log(error.message);
+    return [];
+  }
+}

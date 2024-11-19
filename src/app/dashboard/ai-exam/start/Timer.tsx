@@ -22,7 +22,7 @@ export function Timer() {
   const seconds = Math.floor(remainingTime % 60);
 
   return (
-    <div className="text-lg font-semibold">
+    <div className="text-lg font-semibold text-red-500">
       Time Remaining: {minutes.toString().padStart(2, "0")}:
       {seconds.toString().padStart(2, "0")}
     </div>

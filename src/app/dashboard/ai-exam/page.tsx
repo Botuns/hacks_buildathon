@@ -55,6 +55,7 @@ export default function Component() {
         formData.questionCount
       );
       if (!exam.title) {
+        console.log("error at the object" + exam);
         toast.error("Failed to generate exam");
         return;
       }

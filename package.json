@@ -10,7 +10,12 @@
     "postinstall": "npx prisma generate"
   },
   "dependencies": {
-    "@ai-sdk/openai": "^0.0.72",
+    "@ai-sdk/anthropic": "^1.1.5",
+    "@ai-sdk/azure": "^1.1.5",
+    "@ai-sdk/deepseek": "^0.1.6",
+    "@ai-sdk/openai": "^1.1.5",
+    "@ai-sdk/provider": "^1.0.6",
+    "@ai-sdk/togetherai": "^0.1.6",
     "@hookform/resolvers": "^3.9.0",
     "@humeai/voice-react": "^0.1.15",
     "@liveblocks/client": "^2.8.2",

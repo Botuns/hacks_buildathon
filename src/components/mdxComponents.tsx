@@ -1,8 +1,7 @@
-import React from "react";
+import React, { useEffect, useRef, HTMLAttributes } from "react";
 import Image from "next/image";
+import mermaid from "mermaid";
 import { PrismLight as SyntaxHighlighter } from "react-syntax-highlighter";
-// import { tomorrow } from "react-syntax-highlighter/dist/cjs/styles/prism";
-import { HTMLAttributes } from "react";
 import { materialLight } from "react-syntax-highlighter/dist/esm/styles/prism";
 
 interface CustomComponentProps extends HTMLAttributes<HTMLElement> {
@@ -12,7 +11,82 @@ interface CustomComponentProps extends HTMLAttributes<HTMLElement> {
   children?: React.ReactNode;
 }
 
+// ✅ Alert Component
+const Alert = ({
+  variant = "info",
+  children,
+}: {
+  variant: "info" | "note" | "tip" | "warning";
+  children: React.ReactNode;
+}) => {
+  const styles = {
+    info: "bg-blue-100 text-blue-800 border-l-4 border-blue-500 p-4",
+    note: "bg-gray-100 text-gray-800 border-l-4 border-gray-500 p-4",
+    tip: "bg-green-100 text-green-800 border-l-4 border-green-500 p-4",
+    warning: "bg-yellow-100 text-yellow-800 border-l-4 border-yellow-500 p-4",
+  };
+  return <div className={`${styles[variant]} my-4 rounded`}>{children}</div>;
+};
+
+// ✅ VideoExplanation Component
+const VideoExplanation = ({
+  title,
+  duration,
+  children,
+}: {
+  title: string;
+  duration: string;
+  children: React.ReactNode;
+}) => (
+  <div className="p-4 border-l-4 border-blue-400 bg-blue-50 rounded-lg my-4">
+    <h3 className="font-semibold">
+      {title} ({duration})
+    </h3>
+    <div className="text-sm">{children}</div>
+  </div>
+);
+
+// ✅ Exercise Component
+const Exercise = ({ children }: { children: React.ReactNode }) => (
+  <div className="p-4 border-l-4 border-purple-400 bg-purple-50 rounded-lg my-4">
+    <h3 className="font-semibold">Exercise</h3>
+    <div className="text-sm">{children}</div>
+  </div>
+);
+
+// ✅ Mermaid Component (Fix: Properly initializes Mermaid.js)
+const Mermaid = ({ children }: { children: string }) => {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (ref.current) {
+      mermaid.initialize({ startOnLoad: true });
+      mermaid.init(undefined, ref.current);
+    }
+  }, [children]);
+
+  return (
+    <div className="mermaid" ref={ref}>
+      {children}
+    </div>
+  );
+};
+
+// ✅ Quiz Component
+const Quiz = ({ children }: { children: React.ReactNode }) => (
+  <div className="p-4 border-l-4 border-green-400 bg-green-50 rounded-lg my-4">
+    <h3 className="font-semibold">Quiz</h3>
+    <div className="text-sm">{children}</div>
+  </div>
+);
+
+// ✅ MDX Components Export
 const mdxComponents = {
+  Alert,
+  VideoExplanation,
+  Exercise,
+  Mermaid,
+  Quiz,
   h1: (props: HTMLAttributes<HTMLHeadingElement>) => (
     <h1 className="text-3xl font-bold my-4" {...props} />
   ),
@@ -92,10 +166,10 @@ const mdxComponents = {
   }: CustomComponentProps) => {
     const match = /language-(\w+)/.exec(className || "");
     return !inline && match ? (
+      // @ts-ignore
       <SyntaxHighlighter
-        // @ts-ignore
+      // @ts-ignore
         style={materialLight}
-        // style={tomorrow as React.CSSProperties}
         language={match[1]}
         PreTag="div"
         {...props}

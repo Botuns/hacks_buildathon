@@ -13,9 +13,9 @@ import { ExamSchema } from "./exam-schema";
 // import { createAzure } from "@ai-sdk/azure";
 import { createTogetherAI } from "@ai-sdk/togetherai";
 
-// const togetherai = createTogetherAI({
-//   apiKey: "82856e5a632e566e98fdc7e4644594b931743a2c7a8f2ef4db40e32d8ab4bdd6",
-// });
+const togetherai = createTogetherAI({
+  apiKey: "82856e5a632e566e98fdc7e4644594b931743a2c7a8f2ef4db40e32d8ab4bdd6",
+});
 
 // const azure = createAzure({
 //   resourceName: "your-resource-name", // Azure resource name
@@ -24,7 +24,7 @@ import { createTogetherAI } from "@ai-sdk/togetherai";
 
 const token = "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";
 const endpoint = "https://models.inference.ai.azure.com";
-const modelName = "gpt-4o";
+const modelName = "gpt-4o-mini";
 // Check for API key
 const apiKey = process.env.OPENAI_API_KEY;
 if (!apiKey) {
@@ -32,8 +32,8 @@ if (!apiKey) {
 }
 
 const openai = createOpenAI({
-  apiKey: token,
-  baseURL: endpoint,
+  apiKey,
+  // baseURL: endpoint,
   compatibility: "strict",
 });
 
@@ -47,17 +47,17 @@ const MODEL_NAME = "gpt-4o-mini";
 export async function GenerateCourseOutput(prompt: string) {
   try {
     const response = await generateObject({
-      // model: togetherai("deepseek-ai/DeepSeek-R1"),
+      // model: togetherai("deepseek-ai/deepseek-llm-67b-chat"),
       model: openai(modelName),
       schema: courseSchema,
       prompt: prompt,
     });
     // console.log(response); --- write the response to a jsson file
-    const jsonData = JSON.stringify(response, null, 2);
+    // const jsonData = JSON.stringify(response, null, 2);
 
     // Write the JSON data to a file
-    await fs.writeFile("response.json", jsonData);
-    console.log("Response has been written to response.json");
+    // await fs.writeFile("response.json", jsonData);
+    // console.log("Response has been written to response.json");
 
     return response.object as CourseContent;
   } catch (error) {

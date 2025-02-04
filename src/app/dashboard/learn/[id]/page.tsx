@@ -14,6 +14,7 @@ import {
 import { Course } from "@prisma/client";
 import { toast, Toaster } from "sonner";
 import { Button } from "@/components/ui/button";
+import { Alert } from "@/components/ui/alert";
 import { Loader2, BookOpen, Mic, Trophy } from "lucide-react";
 import {
   Dialog,
